@@ -1,0 +1,11 @@
+{
+  "name": "volunteer",
+  "version": "1.0.0",
+  "description": "Social platform that matches volunteers with causes they're interested in",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}
