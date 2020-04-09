@@ -4,7 +4,8 @@
   "description": "A social platform where volunteers are matched with causes that matter to them",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
   },
   "author": "",
   "license": "ISC",
@@ -18,8 +19,12 @@
     "express": "^4.17.1",
     "jwt-simple": "^0.5.6",
     "mocha": "^7.1.1",
+    "mongoose": "^5.9.7",
     "morgan": "^1.10.0",
     "sinon": "^9.0.2",
     "supertest": "^4.0.2"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.3"
   }
 }
