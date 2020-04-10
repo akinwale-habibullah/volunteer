@@ -3,6 +3,7 @@ angular.module('volunteer', [
     'attachTokenInterceptor',
     'authController',
     'homeController',
+    'userController',
     'appController',
     'appRoutes'
 ]);

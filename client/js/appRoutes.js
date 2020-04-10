@@ -17,6 +17,10 @@ angular
                     templateUrl: 'views/signin.html',
                     controller: 'AuthController'
                 })
+                .when('/users/:userid/profile', {
+                    templateUrl: 'views/profile.html',
+                    controller: 'UserController'
+                })
                 .otherwise({
                     redirectTo: "/"
                 });
@@ -24,10 +28,7 @@ angular
                 /**
                  * Other routes
                  */
-                // .when('/users/:userid/profile', {
-                //     templateUrl: 'views/profile',
-                //     controller: 'UserController'
-                // })
+                
                 // .when('/jobs', {
                 //     templateUrl: 'views/jobs.html',
                 //     controller: 'JobsController'
