@@ -1,3 +1,4 @@
+var path = require('path');
 var userController = require('../controllers/user');
 var jobsController = require('../controllers/jobs');
 var applicationsController = require('../controllers/applications');
@@ -6,6 +7,10 @@ module.exports = function(app, express) {
 
     // TODO:    Coordinate with frontend on
     //          the request url names ('/api/....')
+    app.get('/', function(res, res) {
+        filepath = path.join(process.cwd(), 'client', 'index.html');
+        res.sendFile(filepath);
+    });
 
     //POST - signup
     app.post('/api/v1/auth/signup', userController.signup);
