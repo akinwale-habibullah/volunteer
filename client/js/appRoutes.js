@@ -19,7 +19,8 @@ angular
                 })
                 .when('/users/:userid/profile', {
                     templateUrl: 'views/profile.html',
-                    controller: 'UserController'
+                    controller: 'UserController',
+                    authenticate: true
                 })
                 .otherwise({
                     redirectTo: "/"

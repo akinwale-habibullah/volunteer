@@ -1,5 +1,6 @@
 angular
-    .module('attachTokenInterceptor', []).factory('AttachTokens', [
+    .module('attachTokenInterceptor', [])
+    .factory('AttachTokens', [
         '$window',
         function($window){
             // this is an $httpInterceptor
