@@ -2,7 +2,8 @@ angular
     .module('appRoutes', [])
     .config([
         '$routeProvider',
-        function($routeProvider) {
+        '$httpProvider',
+        function($routeProvider, $httpProvider) {
             $routeProvider
                 .when('/', {
                     templateUrl: 'views/home.html',
@@ -53,6 +54,6 @@ angular
                 // })
                 
 
-            // $httpProvider.interceptors.push('AttachTokens');
+            $httpProvider.interceptors.push('AttachTokens');
         }
     ]);
