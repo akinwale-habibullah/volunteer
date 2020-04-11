@@ -71,8 +71,9 @@ var signin = function(req, res) {
                 });
             } else {
                 user.comparePasswords(password, function(err, match) {
+                    if(err || !match) return helpers.make_response(400, 'Incorrect login credentials', 'fail', res) ;
+                    
                     token = jwt.encode(user, 'secret');
-
                     res.json({
                         token,
                         userid: user['_id'],

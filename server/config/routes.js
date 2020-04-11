@@ -5,13 +5,17 @@ var applicationsController = require('../controllers/applications');
 
 module.exports = function(app, express) {
 
-    // TODO:    Coordinate with frontend on
-    //          the request url names ('/api/....')
+    /**
+     * Front end app
+     */
     app.get('/', function(res, res) {
         filepath = path.join(process.cwd(), 'client', 'index.html');
         res.sendFile(filepath);
     });
 
+    /**
+     * API Endpoints
+     */
     //POST - signup
     app.post('/api/v1/auth/signup', userController.signup);
     // POST - signin
