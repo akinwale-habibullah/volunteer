@@ -71,7 +71,7 @@ var signin = function(req, res) {
                 });
             } else {
                 user.comparePasswords(password, function(err, match) {
-                    if(err || !match) return helpers.make_response(400, 'Incorrect login credentials', 'fail', res) ;
+                    if(err || !match) return helpers.makeResponse(400, 'Incorrect login credentials', 'fail', res) ;
                     
                     token = jwt.encode(user, 'secret');
                     res.json({
@@ -88,7 +88,7 @@ var profile = function(req, res) {
     // validate req
     token = req.headers['token'];
     if (!token) {
-        return helpers.make_response('fail', 'Invalid authentication token in request header', 400, res);
+        return helpers.makeResponse('fail', 'Invalid authentication token in request header', 400, res);
     };
 
     // decode token
@@ -96,19 +96,20 @@ var profile = function(req, res) {
     try {
         decoded = jwt.decode(token, 'secret');
     } catch (error) {
-        return helpers.make_response(400, error.message, 'fail', res);
+        return helpers.makeResponse(400, error.message, 'fail', res);
     }
 
     // get user details of user in request parameters
     User.findOne({'_id': req.params.userid}, function(err, user_obj) {
         if (err) {
-            return helpers.make_response(500, error.message, 'error', res);
+            return helpers.makeResponse(500, error.message, 'error', res);
         }
 
         if (!user_obj) {
-            return helpers.make_response(400, 'Invalid userid in request parameters', 'fail', res);
+            return helpers.makeResponse(400, 'Invalid userid in request parameters', 'fail', res);
         }
 
+        // TODO: Fetch relevant user info in jobs and applications
         res.json({
             status: 'success',
             data: {

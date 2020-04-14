@@ -1,5 +1,9 @@
-var addApplication = function(req, res) {
-    return res.send({message: 'hello - addApplication'});
+var apply = function(req, res) {
+    return res.send({message: 'hello - apply'});
+};
+
+var getApplication = function(req, res) {
+    return res.send({message: 'hello - getApplication'});
 };
 
 var getApplications = function(req, res) {
@@ -10,9 +14,9 @@ var editApplication = function(req, res) {
     return res.send({message: 'hello - editApplication'});
 };
 
-
 module.exports = {
-    addApplication,
+    apply,
+    getApplication,
     getApplications,
     editApplication
 };

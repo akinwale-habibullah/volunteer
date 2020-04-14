@@ -14,7 +14,7 @@ var schema = new mongoose.Schema({
         default: Date.now
     },
     status: String,
-    staffed_user: String
+    staffed_user: Number
 });
 
 module.exports = mongoose.model('Job', schema);
