@@ -44,12 +44,16 @@ module.exports = function(app, express) {
 
     // POST - applications
     app.post('/api/v1/jobs/:jobid/apply', applicationsController.apply);
-    // POST - applications
-    app.get('/api/v1/jobs/:jobid/applications', applicationsController.getJobApplications);
     // GET - one application
     app.get('/api/v1/applications/:applicationid', applicationsController.getApplication);
-    // GET - applications
+    // GET - all applications
     app.get('/api/v1/applications', applicationsController.getApplications);
-    // PATCH - jobs
-    app.post('/api/v1/applications/:applicationid', applicationsController.editApplication);
+    // GET - job applications
+    app.get('/api/v1/jobs/:jobid/applications', applicationsController.getJobApplications);
+    // GET - user applications
+    app.get('/api/v1/users/:userid/applications', applicationsController.getUserApplications);
+    // PATCH - applications
+    app.patch('/api/v1/applications/:applicationid', applicationsController.editApplication);
+    // DELETE - applications
+    app.delete('/api/v1/applications/:applicationid', applicationsController.editApplication);
 };
