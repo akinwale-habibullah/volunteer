@@ -43,9 +43,13 @@ module.exports = function(app, express) {
     // app.patch('/api/v1/jobs/:jobid/staffapplicant', jobsController.staffApplicant);
 
     // POST - applications
-    app.post('/api/v1/jobs/:jobid/applications', applicationsController.addApplication);
+    app.post('/api/v1/jobs/:jobid/apply', applicationsController.apply);
+    // POST - applications
+    app.get('/api/v1/jobs/:jobid/applications', applicationsController.getJobApplications);
+    // GET - one application
+    app.get('/api/v1/applications/:applicationid', applicationsController.getApplication);
     // GET - applications
-    app.get('/api/v1/jobs/:jobid/applications', applicationsController.getApplications);
+    app.get('/api/v1/applications', applicationsController.getApplications);
     // PATCH - jobs
     app.post('/api/v1/applications/:applicationid', applicationsController.editApplication);
 };
