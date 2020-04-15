@@ -72,13 +72,13 @@ var deleteJob = function(req, res) {
     var jobid = req.params.jobid;
 
     // search db for _id equals our jobid
-    Job.findOneAndDelete({_id: jobid}, function(err, deletedJob) {
+    Job.findOneAndDelete({_id: jobid}, {useFindAndModify: false}, function(err, deletedJob) {
         if(err) return makeResponse(400, JSON.stringify(err), 'fail', res);
 
         // return HTTP response.
         return res.json({
             status: 'success',
-            data: jobObject
+            data: deletedJob
         });
     });
 };
