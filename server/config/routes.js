@@ -1,9 +1,13 @@
 var path = require('path');
+var { checkSchema } = require('express-validator');
+
 var userController = require('../controllers/user');
 var jobsController = require('../controllers/jobs');
 var applicationsController = require('../controllers/applications');
 
-module.exports = function(app, express) {
+var authValidationSchema = require('./validation-schemas/auth');
+
+function addRoutes (app, express) {
 
     /**
      * Front end app
@@ -17,11 +21,11 @@ module.exports = function(app, express) {
      * API Endpoints
      */
     //POST - signup
-    app.post('/api/v1/auth/signup', userController.signup);
+    app.post('/api/v1/auth/signup', checkSchema(authValidationSchema.signup) , userController.signup);
     // POST - signin
-    app.post('/api/v1/auth/signin', userController.signin);
+    app.post('/api/v1/auth/signin', checkSchema(authValidationSchema.login), userController.signin);
     //GET - profile
-    app.get('/api/v1/users/:userid/profile', userController.profile);
+    app.get('/api/v1/users/:userid/profile', checkSchema(authValidationSchema.profile), userController.profile);
 
     // POST - jobs
     app.post('/api/v1/jobs', jobsController.addJob);
@@ -57,3 +61,5 @@ module.exports = function(app, express) {
     // DELETE - applications
     app.delete('/api/v1/applications/:applicationid', applicationsController.editApplication);
 };
+
+module.exports = addRoutes;

@@ -1,35 +1,22 @@
 var jwt = require('jwt-simple');
-var User = require('../models/userModel');
 var helpers = require('../config/helpers');
+var User = require('../models/userModel');
 
 var signup = function(req, res) {
+    helpers.checkForValidationErr(req, res);
+
     var email = req.body.email;
     var newUserObj = req.body;
-
     User.findOne({'email': email}, function(err, user){
         if (err) {
-            console.log('mongo findOne signup err: ', err);
-            res.status(400);
-            return res.json({
-                status: 'fail',
-                data: {
-                    message: err
-                }
-            });
+            return helpers.makeErrorResponse(500, JSON.stringify(err), res);
         } else {
             if (user) {
-                res.status(400);
-                return res.json({
-                    status: 'fail',
-                    data: {
-                        message: "Email already taken"
-                    }
-                });
+                return helpers.makeFailResponse(400, "Email already exists", res);
             } else {
                 User.create(newUserObj, function(err, user) {
                     if(err) {
-                        console.log("mongo create user err: ", err);
-                        return res.json(err);
+                        return helpers.makeErrorResponse(500, JSON.stringify(err), res);
                     }
 
                     var token = jwt.encode(user, 'secret');
@@ -47,31 +34,19 @@ var signup = function(req, res) {
 };
 
 var signin = function(req, res) {
+    helpers.checkForValidationErr(req, res);
+
     var email = req.body.email;
     var password = req.body.password;
-
     User.findOne({'email': email}, function(err, user){
         if (err) {
-            console.log('mongo findOne signup err: ', err);
-            res.status(400);
-            return res.json({
-                status: 'fail',
-                data: {
-                    message: err
-                }
-            });
+            return helpers.makeErrorResponse(500, JSON.stringify(err), res);
         } else {
             if (!user) {
-                res.status(400);
-                return res.json({
-                    status: 'fail',
-                    data: {
-                        message: "Incorrect login credentials"
-                    }
-                });
+                return helpers.makeFailResponse(404, 'Incorrect login credentials', res);
             } else {
                 user.comparePasswords(password, function(err, match) {
-                    if(err || !match) return helpers.makeResponse(400, 'Incorrect login credentials', 'fail', res) ;
+                    if(err || !match) return helpers.makeFailResponse(400, 'Incorrect login credentials', res) ;
                     
                     token = jwt.encode(user, 'secret');
                     res.json({
@@ -85,28 +60,23 @@ var signin = function(req, res) {
 };
 
 var profile = function(req, res) {
-    // validate req
-    token = req.headers['token'];
-    if (!token) {
-        return helpers.makeResponse('fail', 'Invalid authentication token in request header', 400, res);
-    };
+    helpers.checkForValidationErr(req, res);
+    var decode = helpers.decodeToken(req, res);
+    if(!decode) return;
 
-    // decode token
-    var decoded;
-    try {
-        decoded = jwt.decode(token, 'secret');
-    } catch (error) {
-        return helpers.makeResponse(400, error.message, 'fail', res);
-    }
+    // TODO:
+    // check if its own or admin using roles
+    // 1 for admin
+    // 3 for end user
 
     // get user details of user in request parameters
     User.findOne({'_id': req.params.userid}, function(err, user_obj) {
         if (err) {
-            return helpers.makeResponse(500, error.message, 'error', res);
+            return helpers.makeErrorResponse(500, JSON.stringify(err), res);
         }
 
         if (!user_obj) {
-            return helpers.makeResponse(400, 'Invalid userid in request parameters', 'fail', res);
+            return helpers.makeFailResponse(400,  'Invalid userid in request parameters', res);
         }
 
         // TODO: Fetch relevant user info in jobs and applications
