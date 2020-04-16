@@ -12,6 +12,11 @@ var UserSchema = new mongoose.Schema({
     location: String,
     gender: String,
     expertise: String,
+    role: {
+        type: Number, 
+        enum: [1, 2, 3],
+        default: 3
+    },
     volunteer_hours: Number
 });
 UserSchema.methods.comparePasswords = function(enteredPassword, callback){
