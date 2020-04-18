@@ -1,23 +1,32 @@
 var mongoose = require('mongoose');
 
-/**
- * TODO:
- * 
- * Model relationship with Job and User models
- * Mark required fields
- * Add model functions to abstract CRUD functionality
- */
-var ObjectId = mongoose.Schema.ObjectId;
 var schema = new mongoose.Schema({
-    job_id: ObjectId,
-    user_id: ObjectId,
-    hours_commitment_per_week: Number,
-    motivation: String,
-    status: String,
-    created_at: {
-        type: Date,
-        default: Date.now
+    job_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Job',
+        required: true,
+    },
+    user_id: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'User',
+        required: true,
+    },
+    hours_commitment_per_week: {
+        type: Number,
+        min: 1,
+        max: 12,
+        required: true,
+    },
+    motivation: {
+        type: String,
+        minlength: 100,
+        maxlength: 500,
+        required: true
+    },
+    staffing_status: {
+        type: String,
+        enum: ['available', 'hired']
     }
-});
+}, {timestamps: true});
 
 module.exports = mongoose.model('Application', schema);
