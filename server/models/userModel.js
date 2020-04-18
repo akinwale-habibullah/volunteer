@@ -3,22 +3,76 @@ var bcrypt = require('bcrypt-nodejs');
 
 var UserSchema = new mongoose.Schema({
     name: {
-        first: String,
-        last: String
+        first: {
+            type: String,
+            lowercase: true,
+            trim: true,
+            required: true
+        },
+        last: {
+            type: String,
+            lowercase: true,
+            trim: true,
+            required: true
+        },
     },
-    email: String,
-    password: String,
+    email: {
+        type: String,
+        trim: true,
+        index: true,
+        required: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
     imageUrl: String,
-    location: String,
-    gender: String,
-    expertise: String,
+    address: {
+        street: String,
+        city: {
+            type: String,
+            lowercase: true,
+            trim: true,
+            required: true
+        },
+        country:{
+            type: String,
+            lowercase: true,
+            trim: true,
+            required: true
+        }
+    },
+    gender: {
+        type: String,
+        enum: ['male', 'female', 'prefer not to say']
+    },
+    bio: {
+        type: String,
+        minLength: 100,
+        maxLength: 500
+    },
     role: {
         type: Number, 
-        enum: [1, 2, 3],
+        min: 1,
+        max: 3,
+        required: true,
         default: 3
     },
-    volunteer_hours: Number
-});
+    volunteer_hours: {
+        type: Number,
+        max: 12,
+        min: 1
+    },
+    jobs: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Job'
+    }],
+    applications: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Application'
+    }]
+}, {timestamps: true});
+
 UserSchema.methods.comparePasswords = function(enteredPassword, callback){
     var hashedPassword = this.password;
 
@@ -26,6 +80,7 @@ UserSchema.methods.comparePasswords = function(enteredPassword, callback){
         callback(err, match);
     });
 };
+
 UserSchema.pre('save', function(next) {
     var user = this;
 
