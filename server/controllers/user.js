@@ -61,8 +61,7 @@ var signin = function(req, res) {
 
 var profile = function(req, res) {
     helpers.checkForValidationErr(req, res);
-    var decode = helpers.decodeToken(req, res);
-    if(!decode) return;
+    if(!req.decodedToken) return helpers.makeFailResponse(400, 'Missing token in request header', res);
 
     // TODO:
     // check if its own or admin using roles

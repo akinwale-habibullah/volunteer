@@ -8,6 +8,7 @@ const jobsController = require('../controllers/jobs');
 const applicationsController = require('../controllers/applications');
 
 const authValidationSchema = require('./validation-schemas/auth');
+const { decodeToken } = require('../config/helpers');
 
 function addRoutes (app, express) {
 
@@ -34,18 +35,18 @@ function addRoutes (app, express) {
     // POST - signin
     app.post('/api/v1/auth/signin', checkSchema(authValidationSchema.login), userController.signin);
     //GET - profile
-    app.get('/api/v1/users/:userid/profile', checkSchema(authValidationSchema.profile), userController.profile);
+    app.get('/api/v1/users/:userid/profile', decodeToken, checkSchema(authValidationSchema.profile), userController.profile);
 
     // POST - jobs
-    app.post('/api/v1/jobs', jobsController.addJob);
+    app.post('/api/v1/jobs', decodeToken, jobsController.addJob);
     // GET - jobs
     app.get('/api/v1/jobs', jobsController.getJobs);
     // GET - jobs/:jobid
-    app.get('/api/v1/jobs/:jobid', jobsController.getOneJob);
+    app.get('/api/v1/jobs/:jobid', decodeToken, jobsController.getOneJob);
     // PATCH - jobs/:jobid
-    app.patch('/api/v1/jobs/:jobid', jobsController.updateJob);
+    app.patch('/api/v1/jobs/:jobid', decodeToken, jobsController.updateJob);
     // DELETE - jobs/:jobid
-    app.delete('/api/v1/jobs/:jobid', jobsController.deleteJob);
+    app.delete('/api/v1/jobs/:jobid', decodeToken, jobsController.deleteJob);
 
     // OPTIONAL - NICE TO HAVES
     //  // PATCH - jobs/:jobid
@@ -56,19 +57,19 @@ function addRoutes (app, express) {
     // app.patch('/api/v1/jobs/:jobid/staffapplicant', jobsController.staffApplicant);
 
     // POST - applications
-    app.post('/api/v1/jobs/:jobid/apply', applicationsController.apply);
+    app.post('/api/v1/jobs/:jobid/apply', decodeToken, applicationsController.apply);
     // GET - one application
-    app.get('/api/v1/applications/:applicationid', applicationsController.getApplication);
+    app.get('/api/v1/applications/:applicationid', decodeToken, applicationsController.getApplication);
     // GET - all applications
-    app.get('/api/v1/applications', applicationsController.getApplications);
+    app.get('/api/v1/applications', decodeToken, applicationsController.getApplications);
     // GET - job applications
-    app.get('/api/v1/jobs/:jobid/applications', applicationsController.getJobApplications);
+    app.get('/api/v1/jobs/:jobid/applications', decodeToken, applicationsController.getJobApplications);
     // GET - user applications
-    app.get('/api/v1/users/:userid/applications', applicationsController.getUserApplications);
+    app.get('/api/v1/users/:userid/applications', decodeToken, applicationsController.getUserApplications);
     // PATCH - applications
-    app.patch('/api/v1/applications/:applicationid', applicationsController.editApplication);
+    app.patch('/api/v1/applications/:applicationid', decodeToken, applicationsController.editApplication);
     // DELETE - applications
-    app.delete('/api/v1/applications/:applicationid', applicationsController.editApplication);
+    app.delete('/api/v1/applications/:applicationid', decodeToken, applicationsController.editApplication);
 };
 
 module.exports = addRoutes;

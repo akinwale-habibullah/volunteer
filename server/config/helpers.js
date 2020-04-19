@@ -34,17 +34,20 @@ var validationErrResponse = function(errors, res){
     });
 }
 
-var decodeToken = function(req, res){
+var decodeToken = function(req, res, next){
     // decode token
-    var decoded;
+    let decoded;
+
     try {
         decoded = jwt.decode(token, 'secret');
     } catch (error) {
-        makeFailResponse(400, JSON.stringify(err), res);
-        return;
+        return makeFailResponse(400, JSON.stringify(err), res);
     }
 
-    return decoded;
+    if(!decoded) return makeFailResponse(400, 'Missing token in request header', res);
+
+    req.decodedToken = decoded;
+    next();
 }
 
 module.exports = {
