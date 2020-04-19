@@ -1,11 +1,34 @@
 {
   "name": "volunteer",
   "version": "1.0.0",
-  "description": "Social platform that matches volunteers with causes they're interested in",
+  "description": "A social platform where volunteers are matched with causes that matter to them",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon index.js"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "bcrypt-nodejs": "0.0.3",
+    "body-parser": "^1.19.0",
+    "browser-sync": "^2.26.7",
+    "chai": "^4.2.0",
+    "clone-stats": "^1.0.0",
+    "express": "^4.17.1",
+    "express-validator": "^6.4.0",
+    "install": "^0.13.0",
+    "jwt-simple": "^0.5.6",
+    "mocha": "^7.1.1",
+    "mongoose": "^5.9.7",
+    "morgan": "^1.10.0",
+    "npm": "^6.14.4",
+    "sinon": "^9.0.2",
+    "supertest": "^4.0.2",
+    "swagger-ui-express": "^4.1.4",
+    "yamljs": "^0.3.0"
+  },
+  "devDependencies": {
+    "nodemon": "^2.0.3"
+  }
 }
