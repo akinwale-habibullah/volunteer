@@ -1,11 +1,13 @@
-var path = require('path');
-var { checkSchema } = require('express-validator');
+const path = require('path');
+const swaggerUi = require('swagger-ui-express');
+const YAML = require('yamljs');
+const { checkSchema } = require('express-validator');
 
-var userController = require('../controllers/user');
-var jobsController = require('../controllers/jobs');
-var applicationsController = require('../controllers/applications');
+const userController = require('../controllers/user');
+const jobsController = require('../controllers/jobs');
+const applicationsController = require('../controllers/applications');
 
-var authValidationSchema = require('./validation-schemas/auth');
+const authValidationSchema = require('./validation-schemas/auth');
 
 function addRoutes (app, express) {
 
@@ -16,6 +18,13 @@ function addRoutes (app, express) {
         filepath = path.join(process.cwd(), 'client', 'index.html');
         res.sendFile(filepath);
     });
+
+    /**
+     * API documentation
+     */
+    const swaggerDocument = YAML.load(path.join(process.cwd(), 'server', 'swagger.yaml'));
+    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+
 
     /**
      * API Endpoints

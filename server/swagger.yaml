@@ -1,0 +1,1047 @@
+openapi: "3.0.3"
+info:
+  title: "VolunteeR"
+  description: "A social network for volunteers. We match volunteers with causes that matter to them, and also helping NGO/Care providers with their volunteer staffing needs."
+  version: 0.0.1
+  termsOfService: "http://swagger.io/terms/"
+  license:
+    name: "Apache 2.0"
+    url: "https://www.apache.org/licenses/LICENSE-2.0.html"
+  contact:
+    name: "Akinwale Folorunsho Habib"
+    url: "https://madebyhabib.com"
+    email: "akinwalehabib@hotmail.com"
+servers:
+  - url: "https://placeholder.heroku.com/api/v1"
+    description: "Production API Server"
+paths:
+  /auth/signup:
+    post:
+      tags:
+        - Auth
+      summary: "Create an account"
+      description: "Auth signup route. Requires user to upload image when signing up for an account"
+      requestBody:
+        $ref: '#/components/requestBodies/signUpRequestBody'
+      responses:
+        "200":
+          $ref: "#/components/responses/authSuccessResponse"
+        "400":
+          $ref: "#/components/responses/failResponse"
+        "5XX":
+          $ref: "#/components/responses/errorResponse"
+  /auth/signin:
+    post:
+      tags: 
+        - Auth
+      summary: "User login"
+      description: "Login using email and password and get user object and auth token in response"
+      requestBody:
+        $ref: '#/components/requestBodies/signInRequestBody'
+      responses:
+        "200":
+          $ref: "#/components/responses/authSuccessResponse"
+        "400":
+          $ref: "#/components/responses/failResponse"
+        "5XX":
+          $ref: "#/components/responses/errorResponse"
+                
+  /users/{userid}/profile:
+    get:
+      tags: 
+        - User
+      summary: "User profile"
+      description: "Get user object with all applications and jobs created"
+      parameters: 
+        - $ref: "#/components/parameters/authTokenHeader"
+        - $ref: "#/components/parameters/userIdPathParameter"
+          
+      responses:
+        "200":
+          $ref: "#/components/responses/userProfile200Response"
+        "400":
+          $ref: "#/components/responses/failResponse"
+        "5XX":
+          $ref: "#/components/responses/errorResponse"
+ 
+  /jobs:
+    get:
+      tags:
+        - Job
+      summary: All jobs
+      description: Get all open jobs in the system.
+        Each job is identified by a numeric `_id`.
+      parameters: 
+        - $ref: "#/components/parameters/authTokenHeader"
+      responses:
+        "200":
+          description: Returns all open jobs in the system.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/jobsGetResponseSchema"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failResponseSchema"
+        "5XX":
+          description: Unexpected application error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseSchema'
+    post:
+      tags:
+        - Job
+      summary: Create a job
+      description: "Create a new Job for volunteers to apply"
+      parameters: 
+        - $ref: "#/components/parameters/authTokenHeader"
+      requestBody:
+        $ref: "#/components/requestBodies/jobsCreateRequestBody"
+      responses:
+        "200":
+          $ref: '#/components/responses/createJobSuccessResponse'
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/failResponseSchema"
+        "5XX":
+          description: Unexpected application error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/errorResponseSchema'
+  /jobs/{jobid}:
+    get:
+      tags: 
+        - Job
+      summary: "Get job detail"
+      description: "Get details of a single job record"
+      parameters: 
+        - $ref: "#/components/parameters/authTokenHeader"
+        - $ref: "#/components/parameters/jobIdPathParameter"
+      responses:
+        "200":
+          $ref: "#/components/responses/jobDetailSuccessResponse"
+        "400":
+          $ref: "#/components/responses/failResponse"
+        "5XX":
+          $ref: "#/components/responses/errorResponse"
+    patch:
+      tags: 
+        - Job
+      summary: "Update job details"
+      description: "Update job details"
+      parameters: 
+        - $ref: "#/components/parameters/authTokenHeader"
+        - $ref: "#/components/parameters/jobIdPathParameter"
+      requestBody:
+        $ref: "#/components/requestBodies/jobsEditRequestBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/jobDetailSuccessResponse"
+        "400":
+          $ref: "#/components/responses/failResponse"
+        "5XX":
+          $ref: "#/components/responses/errorResponse"
+    delete:
+      tags: 
+        - Job
+      summary: "Delete job record"
+      description: "Delete job record"
+      parameters:
+        - $ref: "#/components/parameters/authTokenHeader"
+        - $ref: "#/components/parameters/jobIdPathParameter"
+      responses:
+        "204":
+          $ref: "#/components/responses/deleteResponse"
+        "400":
+          $ref: "#/components/responses/failResponse"
+        "5XX":
+          $ref: "#/components/responses/errorResponse"
+  /jobs/{jobid}/applications:
+    get:
+      tags: 
+        - Job
+      summary: "Get all applications for a specific job"
+      description: "Get all applications for a specific job"
+      parameters: 
+        - $ref: "#/components/parameters/authTokenHeader"
+        - $ref: "#/components/parameters/jobIdPathParameter"
+      responses:
+        "200":
+          $ref: "#/components/responses/jobApplicationsSuccessResponse"
+        "400":
+          $ref: "#/components/responses/failResponse"
+        "5XX":
+          $ref: "#/components/responses/errorResponse"
+  /jobs/{jobid}/applications/{applicationid}/select:
+    patch:
+      tags: 
+        - Job
+      summary: "Select/staff job applicant"
+      description: "Select/hire a application for an open job"
+      parameters: 
+        - $ref: "#/components/parameters/authTokenHeader"
+        - $ref: "#/components/parameters/jobIdPathParameter"
+        - $ref: "#/components/parameters/applicationIdPathParameter"
+      responses:
+        "204":
+          $ref: "#/components/responses/jobApplicationsSelectSuccessResponse"
+        "400":
+          $ref: "#/components/responses/failResponse"
+        "5XX":
+          $ref: "#/components/responses/errorResponse"
+ 
+  /applications:
+    get:
+      tags:
+        - Application
+      summary: All Applications.
+      description: Get all applications for open jobs in the system.
+      parameters: 
+        - $ref: "#/components/parameters/authTokenHeader"
+      responses:
+        "200":
+          $ref: "#/components/responses/applicationsGetSuccessResponse"
+        "400":
+          $ref: "#/components/responses/failResponse"
+        "5XX":
+          $ref: "#/components/responses/errorResponse"
+    post:
+      tags:
+        - Application
+      summary: Apply for an open job role.
+      description: Create application record for an open jobs in the system.
+      parameters:
+        - $ref: "#/components/parameters/authTokenHeader"
+      requestBody:
+        $ref: "#/components/requestBodies/applicationsCreateRequestBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/applicationsCreateSuccessResponse"
+        "400":
+          $ref: "#/components/responses/failResponse"
+        "5XX":
+          $ref: "#/components/responses/errorResponse"
+  /applications/{applicationid}:
+    get:
+      tags:
+        - Application
+      summary: Get application detail.
+      description: Get application detail.
+      parameters: 
+        - $ref: "#/components/parameters/authTokenHeader"
+        - $ref: "#/components/parameters/applicationIdPathParameter"
+      responses:
+        "200":
+          $ref: "#/components/responses/applicationsGetSuccessResponse"
+        "400":
+          $ref: "#/components/responses/failResponse"
+        "5XX":
+          $ref: "#/components/responses/errorResponse"
+    patch:
+      tags:
+        - Application
+      summary: Update application detail.
+      description: Update application detail.
+      parameters: 
+        - $ref: "#/components/parameters/authTokenHeader"
+        - $ref: "#/components/parameters/applicationIdPathParameter"
+      requestBody:
+        $ref: "#/components/requestBodies/applicationsEditRequestBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/applicationsGetSuccessResponse"
+        "400":
+          $ref: "#/components/responses/failResponse"
+        "5XX":
+          $ref: "#/components/responses/errorResponse"
+    delete:
+      tags:
+        - Application
+      summary: Delete an application.
+      description: Delete an application.
+      parameters: 
+        - $ref: "#/components/parameters/authTokenHeader"
+        - $ref: "#/components/parameters/applicationIdPathParameter"
+      responses:
+        "200":
+          $ref: "#/components/responses/deleteResponse"
+        "400":
+          $ref: "#/components/responses/failResponse"
+        "5XX":
+          $ref: "#/components/responses/errorResponse"
+  /users/{userid}/applications:
+    get:
+      tags: 
+        - Application
+      summary: "Select/staff application"
+      description: "Select/staff application for a specific job role posting"
+      parameters: 
+        - $ref: "#/components/parameters/authTokenHeader"
+        - $ref: "#/components/parameters/userIdPathParameter"
+      responses:
+        "200":
+          $ref: "#/components/responses/userApplicationsSuccessResponse"
+        "400":
+          $ref: "#/components/responses/failResponse"
+        "5XX":
+          $ref: "#/components/responses/errorResponse"
+    
+components:
+  schemas:
+    loginRequestBodySchema:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+      example:
+        email: sample@email.com
+        password: password
+    successfulAuthResponseSchema:
+      type: object
+      properties:
+        status: 
+          type: string
+        data: 
+          type: object
+          properties:
+            userId:
+              type: string
+            token:
+              type: string
+      example:
+        status: success
+        data:
+          userId: 808hg84yh9g4
+          token: 93r03u09yt89.38r9y3yn8y238.p39y.3r3
+    userProfileSchema:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: object
+          properties:
+            name:
+              type: object
+              properties:
+                first:
+                  type: string
+                last:
+                  type: string
+            email:
+              type: string
+            image_url:
+              type: string
+            jobs:
+              type: array
+              items:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  job_role:
+                    type: string
+                  description:
+                    type: string
+                  start_date:
+                    type: string
+                  end_date:
+                    type: string
+                  staffing_status:
+                    type: string
+            applications:
+              type: array
+              items:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  job_id:
+                    type: string
+                  job_role:
+                    type: string
+                  motivation:
+                    type: string
+                  staffing_status:
+                    type: string
+      example:
+        status: success
+        data:
+          name: 
+            first: first
+            last: last
+          email: email@demo.com
+          image_url: https://cloudinary.com/kfgku.png
+          jobs:
+            - _id: hewio8399y9r2
+              job_role:  Adult Education Facilitator
+              description:  Teach group of adults on basic communication skills like reading and writing
+              start_date:  22/01/2020
+              end_date:  30/04/2020
+              staffing_status:  closed
+          applications:
+            - _id: 893n9yf92y9y
+              job_id:  8y329nr73t8r37r8
+              job_role:  Curriculum designer
+              motivation:  I love to break down complex concepts and teach them in ways that leaves a lasting impact on students.
+              staffing_status:  open
+    userApplicationsSchema:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: object
+          properties:
+            name:
+              type: object
+              properties:
+                first:
+                  type: string
+                last:
+                  type: string
+            email:
+              type: string
+            image_url:
+              type: string
+            applications:
+              type: array
+              items:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                  job_id:
+                    type: string
+                  job_role:
+                    type: string
+                  motivation:
+                    type: string
+                  staffing_status:
+                    type: string
+                  start_date:
+                    type: string
+                  end_date:
+                    type: string
+      example:
+        status: success
+        data:
+          name: 
+            first: first
+            last: last
+          email: email@demo.com
+          image_url: https://cloudinary.com/kfgku.png
+          jobs:
+            - _id: hewio8399y9r2
+              job_role:  Adult Education Facilitator
+              description:  Teach group of adults on basic communication skills like reading and writing
+              start_date:  22/01/2020
+              end_date:  30/04/2020
+              staffing_status:  closed
+          applications:
+            - _id: 893n9yf92y9y
+              job_id:  8y329nr73t8r37r8
+              job_role:  Curriculum designer
+              motivation:  I love to break down complex concepts and teach them in ways that leaves a lasting impact on students.
+              staffing_status:  closed
+              start_date: 22/01/2020,
+              end_date: 30/04/2020,
+    failResponseSchema:
+      type: object
+      properties:
+        status: 
+          type: string
+        error: 
+            type: string
+      example:
+          status: fail
+          error: "Helpful validation feedback"
+    errorResponseSchema:
+      type: object
+      properties:
+        status: 
+          type: string
+        error: 
+            type: string
+      example:
+        status: error
+        error: "Helpful error feedback"
+    deleteResponseSchema:
+      type: object
+      properties:
+        status: 
+          type: string
+        error: 
+            type: string
+      example:
+        status: success
+        error: null
+    
+    jobSchema:
+      type: object
+      properties:
+        _id:
+          type: string
+        job_role:
+          type: string
+        description:
+          type: string
+        requirements:
+          type: string
+        location:
+          type: object
+          properties:
+            city:
+              type: string
+            street:
+              type: string
+            country:
+              type: string
+        creator_id:
+          type: string
+        creator_img_url:
+          type: string
+        hours_required:
+          type: number
+        start_date:
+          type: string
+        application_end_date:
+          type: string
+        end_date:
+          type: string
+    jobsGetResponseSchema:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/jobSchema"
+      example: 
+        status: success
+        data: 
+          - _id: 8o7r23ny9t2joi
+            job_role: IT Officer
+            description: IT Literate officer needed for introductory computing classes for senior citizens
+            requirements: Computer savvy individual with excellent communication skills. You must be empathetic to be successful in this role.
+            location: 
+              city: Lagos
+              street: Oduntan
+              country: Nigeria
+            creator_id: o83r392yr93y98ufq
+            creator_img_url: https://www.cloudinary.com/jwwe/image.png
+            hours_required: 4
+            start_date: 27/04/2020
+            application_end_date: 20/04/2020
+            end_date: 31/05/2020
+    createJobRequestSchema:
+      type: object
+      properties:
+        job_role:
+          type: string
+        description:
+          type: string
+        requirements:
+          type: string
+        location:
+          type: object
+          properties:
+            city:
+              type: string
+            street:
+              type: string
+            country:
+              type: string
+        hours_required:
+          type: number
+        start_date:
+          type: string
+        application_end_date:
+          type: string
+        end_date:
+          type: string
+      example:
+        job_role: Health officer
+        description: An officer to enlighten uneducated or semi educated adults on good personal hygiene practices
+        requirements: at least 1 year of experience in medical or nursing profession
+        location:
+          city: osun
+          street: ayantuga
+          country: nigeria
+        hours_required: 3
+        start_date: 01/05/2020
+        application_end_date: 23/04/2020
+        end_date: 20/07/2020
+    createJobResponseSchema:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: object
+          properties:
+            _id:
+              type: string
+            job_role:
+              type: string
+            description:
+              type: string
+            requirements:
+              type: string
+            location:
+              type: object
+              properties:
+                city:
+                  type: string
+                street:
+                  type: string
+                country:
+                  type: string
+            start_date:
+              type: string
+            application_end_date:
+              type: string
+            end_date:
+              type: string
+      example:
+        status: success
+        data:
+          - _id: iqehfo3y9r8329
+            job_role: Health officer
+            description: An officer to enlighten uneducated or semi educated adults on good personal hygiene practices
+            requirements: at least 1 year of experience in medical or nursing profession
+            location:
+              city: osun
+              street: ayantuga
+              country: nigeria
+            hours_required: 3
+            start_date: 01/05/2020
+            application_end_date: 23/04/2020,
+            end_date: 20/07/2020
+    jobDetailResponseSchema:
+      type: object
+      properties:
+        status: 
+          type: string
+        data:
+          $ref: "#/components/schemas/jobSchema"
+      example:
+        status: success
+        data:
+          _id: iqehfo3y9r8329
+          job_role: Health officer
+          description: An officer to enlighten uneducated or semi educated adults on good personal hygiene practices
+          requirements: at least 1 year of experience in medical or nursing profession
+          location:
+            city: osun
+            street: ayantuga
+            country: nigeria
+          hours_required: 3
+          start_date: 01/05/2020
+          application_end_date: 23/04/2020
+          end_date: 20/07/2020
+    editJobRequestSchema:
+      type: object
+      properties:
+        status: 
+          type: string
+        data:
+          type: object
+          properties:
+            job_role:
+              type: string
+            decription:
+              type: string
+            requirements:
+              type: string
+            location:
+              type: object
+              properties:
+                city:
+                  type: string
+                street:
+                  type: string
+                country:
+                  type: string
+            hours_required_per_week:
+              type: string
+            start_date:
+              type: string
+            application_end_date:
+              type: string
+            end_date:
+              type: string
+      example: 
+        status: success
+        data:
+          _id: iqehfo3y9r8329
+          job_role: update -  job role
+          description: update -  job description
+          requirements: update -  job requirements
+          location:
+            city: update - city
+            street: update - street
+            country: update - country
+          hours_required: 10 // update
+          start_date: 01/05/2020 // update
+          application_end_date: 23/04/2020 // update
+          end_date: 20/07/2020 // update
+    jobApplicationResponseSchema:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: object
+          properties:
+            _id:
+              type: string
+            job_role:
+              type: string
+            description:
+              type: string
+            requirements:
+              type: string
+            location:
+              type: object
+              properties:
+                city:
+                  type: string
+                street:
+                  type: string
+                country:
+                  type: string
+            creator_id:
+              type: string
+            creator_img_url:
+              type: string
+            hours_required:
+              type: number
+            start_date:
+              type: string
+            application_end_date:
+              type: string
+            end_date:
+              type: string
+            applications:
+              type: array
+              items:
+                $ref: "#/components/schemas/applicationMiniSchema"
+    jobApplicationSelectResponseSchema:
+      type: object
+      properties:
+        status:
+          type: string
+        data:
+          type: string
+      example: 
+        status: success
+        data: null
+    
+    applicationMiniSchema:
+      type: object
+      properties:
+        _id:
+          type: string
+        applicant_id:
+          type: string
+        applicant_img_url:
+          type: string
+        hours_commitment_per_week:
+          type: number
+        motivation:
+          type: string
+        staffing_status:
+          type: string
+    applicationMainSchema:
+      type: object
+      properties:
+        _id:
+          type: string
+        applicant_id:
+          type: string
+        job_id:
+          type: string
+        job_role:
+          type: string
+        applicant_img_url:
+         type: string
+        hours_commitment_per_week:
+          type: number
+        motivation:
+          type: string
+        staffing_status:
+          type: string
+    applicationsCreateRequestSchema: 
+      type: object
+      properties:
+        job_id:
+          type: string
+        hours_commitment_per_week:
+          type: number
+        motivation:
+          type: string
+      example:
+        job_id: ehf83983ry1y39
+        hours_commitment_per_week: 5
+        motivation: lorem ipsum ugiuefgqgi ieqfigi ieqfiuqhiug ifequgifguieqf
+    applicationsCreateResponseSchema:
+      type: object
+      properties:
+        status: 
+          type: string
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/applicationMainSchema"
+      example:
+        _id: ehf83983ry1y39
+        applicant_id: ewyr82393yr928y8r
+        job_id: 98321y951nr
+        job_role: it officer
+        applicant_img_url: https://cloudinary.com/iefe/image.png
+        hours_commitment_per_week: 5
+        motivation: lorem ipsum ugiuefgqgi ieqfigi ieqfiuqhiug ifequgifguieqf
+        staffing_status: open
+    applicationsEditRequestSchema: 
+      type: object
+      properties:
+        hours_commitment_per_week:
+          type: number
+        motivation:
+          type: string
+      example:
+        hours_commitment_per_week: 5
+        motivation: lorem ipsum ugiuefgqgi ieqfigi ieqfiuqhiug ifequgifguieqf
+    
+  parameters:
+    authTokenHeader:
+      in: header
+      name: token
+      schema:
+        type: string
+      required: true
+    userIdPathParameter:
+      in: path
+      name: userid
+      required: true
+      schema:
+        type: string
+    jobIdPathParameter:
+      in: path
+      name: jobid
+      required: true
+      schema:
+        type: string
+    applicationIdPathParameter:
+      in: path
+      name: applicationid
+      required: true
+      schema:
+        type: string
+  requestBodies:
+    signUpRequestBody:
+      description: "Include these fields in your request body"
+      required: true
+      content:
+        "multipart/form-data":
+          schema:
+            type: object
+            properties:
+              name:
+                type: object
+                properties:
+                  first:
+                    type: string
+                  last:
+                    type: string
+              email:
+                type: string
+              password:
+                type: string
+              image:
+                type: string
+                format: binary
+              address:
+                type: object
+                properties:
+                  street:
+                    type: string
+                  city:
+                    type: string
+                  country:
+                    type: string
+              gender:
+                type: string
+                enum: [ male, female, "prefer not to say"]
+              bio:
+                type: string
+                description: A short bio of yourself.
+              volunteer_hours:
+                type: number
+                description: "How many hours are you willing to commit each week?"
+                minimum: 1
+                maximum: 12
+            example:
+              summary: Example of a good request
+              value:
+                name:
+                  first: 'First'
+                  last: 'Last'
+                email: 'demo@example.com'
+                password: 'password'
+                image: 'image.png'
+                address:
+                  street: Broad street
+                  city: Lagos
+                  country: Nigeria
+                gender: male
+                bio: "lorem ipsum dgk ue ohiowqeuigi eiogqw hohe weugiiwe g lewihoghwqogho oeqg ioqehgohqoe g"
+              volunteer_hours: 4
+    signInRequestBody:
+      description: "Include email and password in request body"
+      required: true
+      content:
+        'application/json':
+          schema:
+            $ref: "#/components/schemas/loginRequestBodySchema"
+    jobsCreateRequestBody:
+      description: "Include these fields in your request body"
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/createJobRequestSchema"
+    jobsEditRequestBody:
+      description: "Include any/all of these fields in your request body to update a job record."
+      required: false
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/editJobRequestSchema"
+    applicationsCreateRequestBody:
+      description: "Include all of these fields in your request body to apply for an open job role."
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/applicationsCreateRequestSchema"
+    applicationsEditRequestBody:
+      description: "Include any/all of these fields in your request body to update an application."
+      required: false
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/applicationsEditRequestSchema"
+  responses:
+    authSuccessResponse:
+      description: Login successful..
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/successfulAuthResponseSchema'
+    errorResponse:
+      description: Unexpected application error.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/errorResponseSchema'
+    failResponse:
+      description: Bad request.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/failResponseSchema'
+    deleteResponse:
+      description: "Delete successful"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/deleteResponseSchema'
+          example: 
+            status: success
+            data: null
+    userProfile200Response:
+      description: Login successful..
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/userProfileSchema'
+    userApplicationsSuccessResponse:
+      description: Login successful..
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/userApplicationsSchema'
+    
+    createJobSuccessResponse:
+      description: "Created job successfully"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/createJobResponseSchema'
+    jobDetailSuccessResponse:
+      description: "Get job detail"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/jobDetailResponseSchema'
+          # example:   
+    jobApplicationsSuccessResponse:
+      description: "Get all applications for a specific job posting"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/jobApplicationResponseSchema'
+          # example:   
+    jobApplicationsSelectSuccessResponse:
+      description: "Select and staff an application on an open job role"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/jobApplicationSelectResponseSchema'
+            
+    applicationsGetSuccessResponse:
+      description: "List of all applications for open roles in the system"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/applicationMainSchema'
+    applicationsCreateSuccessResponse:
+      description: "Apply for open job role successful"
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/applicationsCreateResponseSchema'
+
+tags:
+  - name: Auth
+    description: Everything about authentication
+    externalDocs:
+      url: http://docs.my-api.com/pet-operations.htm
+  
+  - name: User
+    description: Everything about the user resource
+    externalDocs:
+      url: http://docs.my-api.com/pet-operations.htm
+      
+  - name: Job
+    description: Everything about the Job resource
+    externalDocs:
+      url: http://docs.my-api.com/pet-operations.htm
+      
+  - name: Application
+    description: Everything about applications resource
+    externalDocs:
+      url: http://docs.my-api.com/pet-operations.htm
