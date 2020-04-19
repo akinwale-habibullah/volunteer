@@ -6,7 +6,7 @@ var schema = new mongoose.Schema({
         ref: 'Job',
         required: true,
     },
-    user_id: {
+    applicant_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User',
         required: true,
@@ -25,7 +25,8 @@ var schema = new mongoose.Schema({
     },
     staffing_status: {
         type: String,
-        enum: ['available', 'hired']
+        enum: ['successful', 'unsuccessful', 'open'],
+        default: 'open'
     }
 }, {timestamps: true});
 
