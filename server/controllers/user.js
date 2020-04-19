@@ -12,7 +12,7 @@ var signup = function(req, res) {
             return helpers.makeErrorResponse(500, JSON.stringify(err), res);
         } else {
             if (user) {
-                return helpers.makeFailResponse(400, "Email already exists", res);
+                return helpers.failResponse(400, "Email already exists", res);
             } else {
                 User.create(newUserObj, function(err, user) {
                     if(err) {
@@ -43,10 +43,10 @@ var signin = function(req, res) {
             return helpers.makeErrorResponse(500, JSON.stringify(err), res);
         } else {
             if (!user) {
-                return helpers.makeFailResponse(404, 'Incorrect login credentials', res);
+                return helpers.failResponse(404, 'Incorrect login credentials', res);
             } else {
                 user.comparePasswords(password, function(err, match) {
-                    if(err || !match) return helpers.makeFailResponse(400, 'Incorrect login credentials', res) ;
+                    if(err || !match) return helpers.failResponse(400, 'Incorrect login credentials', res) ;
                     
                     token = jwt.encode(user, 'secret');
                     res.json({
@@ -60,8 +60,12 @@ var signin = function(req, res) {
 };
 
 var profile = function(req, res) {
-    helpers.checkForValidationErr(req, res);
-    if(!req.decodedToken) return helpers.makeFailResponse(400, 'Missing token in request header', res);
+    const validationErrors = helpers.checkForValidationErr(req, res);
+    if(validationErrors) return helpers.failResponse(400, validationErrors.errors, res);
+
+    if(!req.decodedToken) {
+        return helpers.failResponse(400, 'Missing token in request header', res)
+    };
 
     // TODO:
     // check if its own or admin using roles
@@ -71,12 +75,12 @@ var profile = function(req, res) {
     // get user details of user in request parameters
     User.findOne({'_id': req.params.userid}, function(err, user_obj) {
         if (err) {
-            return helpers.makeErrorResponse(500, JSON.stringify(err), res);
-        }
+            return helpers.errorResponse(500, JSON.stringify(err), res);
+        };
 
         if (!user_obj) {
-            return helpers.makeFailResponse(400,  'Invalid userid in request parameters', res);
-        }
+            return helpers.failResponse(400,  'Invalid userid in request parameters', res);
+        };
 
         // TODO: Fetch relevant user info in jobs and applications
         res.json({

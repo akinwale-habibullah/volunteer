@@ -24,11 +24,11 @@ function addRoutes (app, express) {
      * API documentation
      */
     const swaggerDocument = YAML.load(path.join(process.cwd(), 'server', 'swagger.yaml'));
-    app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+    app.get('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
     /**
-     * API Endpoints
+     * API Endpoints - Auth
      */
     //POST - signup
     app.post('/api/v1/auth/signup', checkSchema(authValidationSchema.signup) , userController.signup);

@@ -1,22 +1,17 @@
 var jwt = require('jwt-simple');
 var { validationResult } = require('express-validator');
 
-var makeResponse = function(status_code, message, status, res) {
-    return res.status(status_code).json({
-        status,
-        data: { message }
-    });
-};
-
-var makeFailResponse = function(status_code, message, status, res) {
-    return res.status(status_code).json({
+var failResponse = function(status_code, message, res) {
+    res.status(status_code);
+    return res.json({
         status: "fail",
         data: { message }
     });
 };
 
-var makeErrorResponse = function(status_code, message, status, res) {
-    return res.status(status_code).json({
+var errorResponse = function(status_code, message, res) {
+    res.status(status_code)
+    return res.json({
         status: "error",
         error: { message }
     });
@@ -24,7 +19,12 @@ var makeErrorResponse = function(status_code, message, status, res) {
 
 var checkForValidationErr = function(req, res){
     const errors = validationResult(req);
-    if(!errors.isEmpty()) return validationErrResponse(errors, res);
+
+    if(!errors.isEmpty()) {
+        return errors;
+    };
+
+    return null;
 }
 
 var validationErrResponse = function(errors, res){
@@ -39,21 +39,22 @@ var decodeToken = function(req, res, next){
     let decoded;
 
     try {
-        decoded = jwt.decode(token, 'secret');
+        decoded = jwt.decode(req.headers.token, 'secret');
     } catch (error) {
-        return makeFailResponse(400, JSON.stringify(err), res);
+        return errorResponse(400, error.message, res);
     }
 
-    if(!decoded) return makeFailResponse(400, 'Missing token in request header', res);
+    if(!decoded) {
+        return failResponse(400, 'Missing token in request header', res)
+    };
 
     req.decodedToken = decoded;
     next();
 }
 
 module.exports = {
-    makeResponse: makeResponse,
-    makeErrorResponse: makeErrorResponse,
-    makeFailResponse: makeFailResponse,
+    errorResponse: errorResponse,
+    failResponse: failResponse,
     validationErrResponse: validationErrResponse,
     checkForValidationErr: checkForValidationErr,
     decodeToken: decodeToken
