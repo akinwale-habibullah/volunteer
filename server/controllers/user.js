@@ -109,7 +109,7 @@ var profile = async function(req, res) {
     // get user details of user in request parameters
     let userObj;
     try {
-        userObj = await User.findOne({'_id': req.params.userid});
+        userObj = await (await User.findOne({'_id': req.decodedToken._id}));
     } catch (error) {
         throw createError(404, error.message);
     }
@@ -119,7 +119,15 @@ var profile = async function(req, res) {
         status: 'success',
         data: {
             _id: userObj._id,
-            name: userObj.email
+            name: userObj.name,
+            email: userObj.email,
+            role: userObj.role,
+            jobs: userObj.jobs,
+            applications: userObj.applications,
+            gender: userObj.gender,
+            volunteerHours: userObj.volunteer_hours,
+            createdAt: userObj.created_at,
+            updatedAt: userObj.updatedAt
         }
     });    
 };
