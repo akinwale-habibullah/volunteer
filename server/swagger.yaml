@@ -22,7 +22,7 @@ paths:
       summary: "Create an account"
       description: "Auth signup route. Requires user to upload image when signing up for an account"
       requestBody:
-        $ref: '#/components/requestBodies/signUpRequestBody'
+        $ref: "#/components/requestBodies/signUpRequestBody"
       responses:
         "200":
           $ref: "#/components/responses/authSuccessResponse"
@@ -32,12 +32,12 @@ paths:
           $ref: "#/components/responses/errorResponse"
   /auth/signin:
     post:
-      tags: 
+      tags:
         - Auth
       summary: "User login"
       description: "Login using email and password and get user object and auth token in response"
       requestBody:
-        $ref: '#/components/requestBodies/signInRequestBody'
+        $ref: "#/components/requestBodies/signInRequestBody"
       responses:
         "200":
           $ref: "#/components/responses/authSuccessResponse"
@@ -45,17 +45,17 @@ paths:
           $ref: "#/components/responses/failResponse"
         "5XX":
           $ref: "#/components/responses/errorResponse"
-                
+
   /users/{userid}/profile:
     get:
-      tags: 
+      tags:
         - User
       summary: "User profile"
       description: "Get user object with all applications and jobs created"
-      parameters: 
+      parameters:
         - $ref: "#/components/parameters/authTokenHeader"
         - $ref: "#/components/parameters/userIdPathParameter"
-          
+
       responses:
         "200":
           $ref: "#/components/responses/userProfile200Response"
@@ -63,7 +63,7 @@ paths:
           $ref: "#/components/responses/failResponse"
         "5XX":
           $ref: "#/components/responses/errorResponse"
- 
+
   /jobs:
     get:
       tags:
@@ -71,7 +71,7 @@ paths:
       summary: All jobs
       description: Get all open jobs in the system.
         Each job is identified by a numeric `_id`.
-      parameters: 
+      parameters:
         - $ref: "#/components/parameters/authTokenHeader"
       responses:
         "200":
@@ -91,19 +91,19 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorResponseSchema'
+                $ref: "#/components/schemas/errorResponseSchema"
     post:
       tags:
         - Job
       summary: Create a job
       description: "Create a new Job for volunteers to apply"
-      parameters: 
+      parameters:
         - $ref: "#/components/parameters/authTokenHeader"
       requestBody:
         $ref: "#/components/requestBodies/jobsCreateRequestBody"
       responses:
         "200":
-          $ref: '#/components/responses/createJobSuccessResponse'
+          $ref: "#/components/responses/createJobSuccessResponse"
         "400":
           description: Bad request.
           content:
@@ -115,14 +115,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/errorResponseSchema'
+                $ref: "#/components/schemas/errorResponseSchema"
   /jobs/{jobid}:
     get:
-      tags: 
+      tags:
         - Job
       summary: "Get job detail"
       description: "Get details of a single job record"
-      parameters: 
+      parameters:
         - $ref: "#/components/parameters/authTokenHeader"
         - $ref: "#/components/parameters/jobIdPathParameter"
       responses:
@@ -133,11 +133,11 @@ paths:
         "5XX":
           $ref: "#/components/responses/errorResponse"
     patch:
-      tags: 
+      tags:
         - Job
       summary: "Update job details"
       description: "Update job details"
-      parameters: 
+      parameters:
         - $ref: "#/components/parameters/authTokenHeader"
         - $ref: "#/components/parameters/jobIdPathParameter"
       requestBody:
@@ -150,7 +150,7 @@ paths:
         "5XX":
           $ref: "#/components/responses/errorResponse"
     delete:
-      tags: 
+      tags:
         - Job
       summary: "Delete job record"
       description: "Delete job record"
@@ -166,11 +166,11 @@ paths:
           $ref: "#/components/responses/errorResponse"
   /jobs/{jobid}/applications:
     get:
-      tags: 
+      tags:
         - Job
       summary: "Get all applications for a specific job"
       description: "Get all applications for a specific job"
-      parameters: 
+      parameters:
         - $ref: "#/components/parameters/authTokenHeader"
         - $ref: "#/components/parameters/jobIdPathParameter"
       responses:
@@ -182,11 +182,11 @@ paths:
           $ref: "#/components/responses/errorResponse"
   /jobs/{jobid}/applications/{applicationid}/select:
     patch:
-      tags: 
+      tags:
         - Job
       summary: "Select/staff job applicant"
       description: "Select/hire a application for an open job"
-      parameters: 
+      parameters:
         - $ref: "#/components/parameters/authTokenHeader"
         - $ref: "#/components/parameters/jobIdPathParameter"
         - $ref: "#/components/parameters/applicationIdPathParameter"
@@ -197,14 +197,14 @@ paths:
           $ref: "#/components/responses/failResponse"
         "5XX":
           $ref: "#/components/responses/errorResponse"
- 
+
   /applications:
     get:
       tags:
         - Application
       summary: All Applications.
       description: Get all applications for open jobs in the system.
-      parameters: 
+      parameters:
         - $ref: "#/components/parameters/authTokenHeader"
       responses:
         "200":
@@ -235,7 +235,7 @@ paths:
         - Application
       summary: Get application detail.
       description: Get application detail.
-      parameters: 
+      parameters:
         - $ref: "#/components/parameters/authTokenHeader"
         - $ref: "#/components/parameters/applicationIdPathParameter"
       responses:
@@ -250,7 +250,7 @@ paths:
         - Application
       summary: Update application detail.
       description: Update application detail.
-      parameters: 
+      parameters:
         - $ref: "#/components/parameters/authTokenHeader"
         - $ref: "#/components/parameters/applicationIdPathParameter"
       requestBody:
@@ -267,7 +267,7 @@ paths:
         - Application
       summary: Delete an application.
       description: Delete an application.
-      parameters: 
+      parameters:
         - $ref: "#/components/parameters/authTokenHeader"
         - $ref: "#/components/parameters/applicationIdPathParameter"
       responses:
@@ -279,11 +279,11 @@ paths:
           $ref: "#/components/responses/errorResponse"
   /users/{userid}/applications:
     get:
-      tags: 
+      tags:
         - Application
       summary: "Select/staff application"
       description: "Select/staff application for a specific job role posting"
-      parameters: 
+      parameters:
         - $ref: "#/components/parameters/authTokenHeader"
         - $ref: "#/components/parameters/userIdPathParameter"
       responses:
@@ -293,7 +293,7 @@ paths:
           $ref: "#/components/responses/failResponse"
         "5XX":
           $ref: "#/components/responses/errorResponse"
-    
+
 components:
   schemas:
     loginRequestBodySchema:
@@ -309,9 +309,9 @@ components:
     successfulAuthResponseSchema:
       type: object
       properties:
-        status: 
+        status:
           type: string
-        data: 
+        data:
           type: object
           properties:
             userId:
@@ -377,24 +377,24 @@ components:
       example:
         status: success
         data:
-          name: 
+          name:
             first: first
             last: last
           email: email@demo.com
           image_url: https://cloudinary.com/kfgku.png
           jobs:
             - _id: hewio8399y9r2
-              job_role:  Adult Education Facilitator
-              description:  Teach group of adults on basic communication skills like reading and writing
-              start_date:  22/01/2020
-              end_date:  30/04/2020
-              staffing_status:  closed
+              job_role: Adult Education Facilitator
+              description: Teach group of adults on basic communication skills like reading and writing
+              start_date: 22/01/2020
+              end_date: 30/04/2020
+              staffing_status: closed
           applications:
             - _id: 893n9yf92y9y
-              job_id:  8y329nr73t8r37r8
-              job_role:  Curriculum designer
-              motivation:  I love to break down complex concepts and teach them in ways that leaves a lasting impact on students.
-              staffing_status:  open
+              job_id: 8y329nr73t8r37r8
+              job_role: Curriculum designer
+              motivation: I love to break down complex concepts and teach them in ways that leaves a lasting impact on students.
+              staffing_status: open
     userApplicationsSchema:
       type: object
       properties:
@@ -436,57 +436,57 @@ components:
       example:
         status: success
         data:
-          name: 
+          name:
             first: first
             last: last
           email: email@demo.com
           image_url: https://cloudinary.com/kfgku.png
           jobs:
             - _id: hewio8399y9r2
-              job_role:  Adult Education Facilitator
-              description:  Teach group of adults on basic communication skills like reading and writing
-              start_date:  22/01/2020
-              end_date:  30/04/2020
-              staffing_status:  closed
+              job_role: Adult Education Facilitator
+              description: Teach group of adults on basic communication skills like reading and writing
+              start_date: 22/01/2020
+              end_date: 30/04/2020
+              staffing_status: closed
           applications:
             - _id: 893n9yf92y9y
-              job_id:  8y329nr73t8r37r8
-              job_role:  Curriculum designer
-              motivation:  I love to break down complex concepts and teach them in ways that leaves a lasting impact on students.
-              staffing_status:  closed
+              job_id: 8y329nr73t8r37r8
+              job_role: Curriculum designer
+              motivation: I love to break down complex concepts and teach them in ways that leaves a lasting impact on students.
+              staffing_status: closed
               start_date: 22/01/2020,
               end_date: 30/04/2020,
     failResponseSchema:
       type: object
       properties:
-        status: 
+        status:
           type: string
-        error: 
-            type: string
+        error:
+          type: string
       example:
-          status: fail
-          error: "Helpful validation feedback"
+        status: fail
+        error: "Helpful validation feedback"
     errorResponseSchema:
       type: object
       properties:
-        status: 
+        status:
           type: string
-        error: 
-            type: string
+        error:
+          type: string
       example:
         status: error
         error: "Helpful error feedback"
     deleteResponseSchema:
       type: object
       properties:
-        status: 
+        status:
           type: string
-        error: 
-            type: string
+        error:
+          type: string
       example:
         status: success
         error: null
-    
+
     jobSchema:
       type: object
       properties:
@@ -528,14 +528,14 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/jobSchema"
-      example: 
+      example:
         status: success
-        data: 
+        data:
           - _id: 8o7r23ny9t2joi
             job_role: IT Officer
             description: IT Literate officer needed for introductory computing classes for senior citizens
             requirements: Computer savvy individual with excellent communication skills. You must be empathetic to be successful in this role.
-            location: 
+            location:
               city: Lagos
               street: Oduntan
               country: Nigeria
@@ -632,7 +632,7 @@ components:
     jobDetailResponseSchema:
       type: object
       properties:
-        status: 
+        status:
           type: string
         data:
           $ref: "#/components/schemas/jobSchema"
@@ -654,49 +654,38 @@ components:
     editJobRequestSchema:
       type: object
       properties:
-        status: 
+        job_role:
           type: string
-        data:
-          type: object
-          properties:
-            job_role:
-              type: string
-            decription:
-              type: string
-            requirements:
-              type: string
-            location:
-              type: object
-              properties:
-                city:
-                  type: string
-                street:
-                  type: string
-                country:
-                  type: string
-            hours_required_per_week:
-              type: string
-            start_date:
-              type: string
-            application_end_date:
-              type: string
-            end_date:
-              type: string
-      example: 
-        status: success
-        data:
-          _id: iqehfo3y9r8329
-          job_role: update -  job role
-          description: update -  job description
-          requirements: update -  job requirements
-          location:
-            city: update - city
-            street: update - street
-            country: update - country
-          hours_required: 10 // update
-          start_date: 01/05/2020 // update
-          application_end_date: 23/04/2020 // update
-          end_date: 20/07/2020 // update
+        decription:
+          type: string
+        requirements:
+          type: string
+        city:
+          type: string
+        street:
+          type: string
+        country:
+          type: string
+        hours_required_per_week:
+          type: string
+        start_date:
+          type: string
+        application_end_date:
+          type: string
+        end_date:
+          type: string
+      example:
+        job_role: update -  job role
+        description: update -  job description
+        requirements: update -  job requirements
+        location:
+          city: update - city
+          street: update - street
+          country: update - country
+        hours_required: 10 // update
+        start_date: 01/05/2020 // update
+        application_end_date: 23/04/2020 // update
+        end_date: 20/07/2020 // update
     jobApplicationResponseSchema:
       type: object
       properties:
@@ -745,10 +734,10 @@ components:
           type: string
         data:
           type: string
-      example: 
+      example:
         status: success
         data: null
-    
+
     applicationMiniSchema:
       type: object
       properties:
@@ -776,14 +765,14 @@ components:
         job_role:
           type: string
         applicant_img_url:
-         type: string
+          type: string
         hours_commitment_per_week:
           type: number
         motivation:
           type: string
         staffing_status:
           type: string
-    applicationsCreateRequestSchema: 
+    applicationsCreateRequestSchema:
       type: object
       properties:
         job_id:
@@ -799,7 +788,7 @@ components:
     applicationsCreateResponseSchema:
       type: object
       properties:
-        status: 
+        status:
           type: string
         data:
           type: array
@@ -814,7 +803,7 @@ components:
         hours_commitment_per_week: 5
         motivation: lorem ipsum ugiuefgqgi ieqfigi ieqfiuqhiug ifequgifguieqf
         staffing_status: open
-    applicationsEditRequestSchema: 
+    applicationsEditRequestSchema:
       type: object
       properties:
         hours_commitment_per_week:
@@ -824,7 +813,7 @@ components:
       example:
         hours_commitment_per_week: 5
         motivation: lorem ipsum ugiuefgqgi ieqfigi ieqfiuqhiug ifequgifguieqf
-    
+
   parameters:
     authTokenHeader:
       in: header
@@ -884,7 +873,7 @@ components:
                     type: string
               gender:
                 type: string
-                enum: [ male, female, "prefer not to say"]
+                enum: [male, female, "prefer not to say"]
               bio:
                 type: string
                 description: A short bio of yourself.
@@ -897,11 +886,11 @@ components:
               summary: Example of a good request
               value:
                 name:
-                  first: 'First'
-                  last: 'Last'
-                email: 'demo@example.com'
-                password: 'password'
-                image: 'image.png'
+                  first: "First"
+                  last: "Last"
+                email: "demo@example.com"
+                password: "password"
+                image: "image.png"
                 address:
                   street: Broad street
                   city: Lagos
@@ -913,7 +902,7 @@ components:
       description: "Include email and password in request body"
       required: true
       content:
-        'application/json':
+        "application/json":
           schema:
             $ref: "#/components/schemas/loginRequestBodySchema"
     jobsCreateRequestBody:
@@ -950,26 +939,26 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/successfulAuthResponseSchema'
+            $ref: "#/components/schemas/successfulAuthResponseSchema"
     errorResponse:
       description: Unexpected application error.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/errorResponseSchema'
+            $ref: "#/components/schemas/errorResponseSchema"
     failResponse:
       description: Bad request.
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/failResponseSchema'
+            $ref: "#/components/schemas/failResponseSchema"
     deleteResponse:
       description: "Delete successful"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/deleteResponseSchema'
-          example: 
+            $ref: "#/components/schemas/deleteResponseSchema"
+          example:
             status: success
             data: null
     userProfile200Response:
@@ -977,70 +966,70 @@ components:
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/userProfileSchema'
+            $ref: "#/components/schemas/userProfileSchema"
     userApplicationsSuccessResponse:
       description: Login successful..
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/userApplicationsSchema'
-    
+            $ref: "#/components/schemas/userApplicationsSchema"
+
     createJobSuccessResponse:
       description: "Created job successfully"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/createJobResponseSchema'
+            $ref: "#/components/schemas/createJobResponseSchema"
     jobDetailSuccessResponse:
       description: "Get job detail"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/jobDetailResponseSchema'
-          # example:   
+            $ref: "#/components/schemas/jobDetailResponseSchema"
+          # example:
     jobApplicationsSuccessResponse:
       description: "Get all applications for a specific job posting"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/jobApplicationResponseSchema'
-          # example:   
+            $ref: "#/components/schemas/jobApplicationResponseSchema"
+          # example:
     jobApplicationsSelectSuccessResponse:
       description: "Select and staff an application on an open job role"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/jobApplicationSelectResponseSchema'
-            
+            $ref: "#/components/schemas/jobApplicationSelectResponseSchema"
+
     applicationsGetSuccessResponse:
       description: "List of all applications for open roles in the system"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/applicationMainSchema'
+            $ref: "#/components/schemas/applicationMainSchema"
     applicationsCreateSuccessResponse:
       description: "Apply for open job role successful"
       content:
         application/json:
           schema:
-            $ref: '#/components/schemas/applicationsCreateResponseSchema'
+            $ref: "#/components/schemas/applicationsCreateResponseSchema"
 
 tags:
   - name: Auth
     description: Everything about authentication
     externalDocs:
       url: http://docs.my-api.com/pet-operations.htm
-  
+
   - name: User
     description: Everything about the user resource
     externalDocs:
       url: http://docs.my-api.com/pet-operations.htm
-      
+
   - name: Job
     description: Everything about the Job resource
     externalDocs:
       url: http://docs.my-api.com/pet-operations.htm
-      
+
   - name: Application
     description: Everything about applications resource
     externalDocs:
