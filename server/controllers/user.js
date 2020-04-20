@@ -1,9 +1,9 @@
-var jwt = require('jwt-simple');
+const jwt = require('jwt-simple');
 const createError = require('http-errors');
-var helpers = require('../config/helpers');
-var User = require('../models/userModel');
+const helpers = require('../config/helpers');
+const User = require('../models/userModel');
 
-var signup = async function(req, res) {
+const signup = async function(req, res) {
     const errors = helpers.checkForValidationErr(req);
     if(errors) {
         throw createError(400, {message: errors.errors});
@@ -61,7 +61,7 @@ var signup = async function(req, res) {
     });
 };
 
-var signin = async function(req, res) {
+const signin = async function(req, res) {
     const errors = helpers.checkForValidationErr(req);
     if(errors) {
         throw createError(400, {message: errors.errors});
@@ -93,14 +93,7 @@ var signin = async function(req, res) {
     });
 };
 
-var profile = async function(req, res) {
-    const validationErrors = helpers.checkForValidationErr(req, res);
-    if(validationErrors) return helpers.failResponse(400, validationErrors.errors, res);
-
-    if(!req.decodedToken) {
-        return helpers.failResponse(400, 'Missing token in request header', res)
-    };
-
+const profile = async function(req, res) {
     // TODO:
     // check if its own or admin using roles
     // 1 for admin

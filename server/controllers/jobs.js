@@ -1,89 +1,178 @@
-var Job = require('../models/jobModel');
-var makeResponse = require('../config/helpers');
+const createError = require('http-errors');
+const helpers = require('../config/helpers');
+const Job = require('../models/jobModel');
+const User = require('../models/userModel');
 
-//  TODO:
-//      Add validation library - joi
-//      Create validator directory for all schemas
-//      NICE TO HAVE: Add methods to Job, to make these controllers even smaller. 
+const addJob = async function(req, res) {
+    const errors = helpers.checkForValidationErr(req);
+    if(errors) {
+        throw createError(400, {message: errors.errors});
+    };
 
+    if(!helpers.compareDate(req.body.application_end_date, req.body.start_date)){
+        throw createError(400, 'Application start date cannot be later than job start date');
+    }
+    if(!helpers.compareDate(req.body.application_end_date, req.body.end_date)){
+        throw createError(400, 'Application start date cannot be later than job end date');
+    }
+    if(!helpers.compareDate(req.body.start_date, req.body.end_date)){
+        throw createError(400, 'Job end date cannot be earlier than job start date');
+    }
 
-var addJob = function(req, res) {
     // get user id
-    var newJobObject = req.body;
+    let newJobObject;
+    newJobObject = new Job({
+        job_role: req.body.job_role,
+        description: req.body.description,
+        requirements: req.body.requirements,
+        location: {
+            street: req.body.street || null,
+            city: req.body.city,
+            country: req.body.country
+        },
+        creator_id: req.decodedToken._id,
+        hours_required_per_week: req.body.hours_required_per_week,
+        start_date: req.body.start_date,
+        end_date: req.body.end_date,
+        application_end_date: req.body.application_end_date
+    });
+    
+    try {
+        await newJobObject.save();
+    } catch (error) {
+        throw createError(500, error.message);
+    }
 
-    Job.create(newJobObject, function(err, jobObject) {
-        if(err) return makeResponse.makeResponse(500, err.message, 'fail', res);
-
-        res.status(201).json({
-            status: 'success',
-            data: jobObject
-        });
+    res.status(201).json({
+        status: 'success',
+        data: newJobObject
     });
 };
 
-var getOneJob = function(req, res) {
+const getJobs = async function(req, res) {
+    // search db for _id equals our jobid
+    let jobs;
+    try {
+        jobs = await Job.find({staffing_status: 'open'});
+    } catch (error) {
+        throw createError(500, error.message);
+    }
+
+
+    res.json({
+        status: 'success',
+        data: jobs
+    });
+};
+
+const getOneJob = async function(req, res) {
+    let job;
+    const jobid = req.params.jobid;
+
+    try {
+        job = await Job.findOne({_id: jobid});
+        console.log(job);
+    } catch (error) {
+        throw createError(400, 'Invalid job id');
+    }
+
+    if(!job) throw createError(404, 'Invalid job id');
+
+    res.json({
+        status: 'success',
+        data: job
+    });
+};
+
+const updateJob = async function(req, res) {
+    const errors = helpers.checkForValidationErr(req);
+    if(errors) {
+        throw createError(400, {message: errors.errors});
+    };
+
     // get jobid from req params
-    var jobid = req.params.jobid;
+    const job = await Job.findOne({_id: req.params.jobid});
+    if(!job) throw createError(404, 'Invalid job id');
 
-    // search db for _id equals our jobid
-    Job.findOne({_id: jobid}, function(err, jobObject) {
-        if(err) return makeResponse(400, JSON.stringify(err), 'fail', res);
+    const update = {
+        job_role: req.body.job_role || job.job_role,
+        description: req.body.description || job.description,
+        requirements: req.body.requirements || job.requirements,
+        location: {
+            street: req.body.street || job.location.street,
+            city: req.body.city || job.location.city,
+            country: req.body.country || job.location.country
+        },
+        hours_required_per_week: req.body.hours_required_per_week || job.hours_required_per_week,
+        start_date: req.body.start_date || job.start_date,
+        end_date: req.body.end_date || job.end_date,
+        application_end_date: req.body.application_end_date || job.application_end_date
+    };
 
-        // return HTTP response.
-        return res.json({
-            status: 'success',
-            data: jobObject
+    if(!helpers.compareDate(update.application_end_date, update.start_date)){
+        throw createError(400, 'Application start date cannot be later than job start date');
+    };
+    if(!helpers.compareDate(update.application_end_date, update.end_date)){
+        throw createError(400, 'Application start date cannot be later than job end date');
+    };
+    if(!helpers.compareDate(update.start_date, update.end_date)){
+        throw createError(400, 'Job end date cannot be earlier than job start date');
+    };
+
+    let updateJob;
+    try {
+        updateJob = await Job.findOneAndUpdate({_id: req.params.jobid}, update, function(err, document) {
+            return new Promise(function(resolve, reject){
+                if(err) return reject(err);
+    
+                resolve(document);
+            });
         });
+    } catch (error) {
+        throw createError(400, err.message);
+    }
+    
+    res.json({
+        status: 'success',
+        date: updateJob
     });
 };
 
-var getJobs = function(req, res) {
-    // search db for _id equals our jobid
-    Job.find({}, function(err, jobObject) {
-        if(err) return makeResponse(400, JSON.stringify(err), 'fail', res);
+const deleteJob = async function(req, res) {
+    let job;
+    try {
+        job = await Job.findOne({_id: req.params.jobid});
+    } catch (error) {
+        throw createError(400, 'Invalid job id');
+    }
 
-        // return HTTP response.
-        return res.json({
-            status: 'success',
-            data: jobObject
+    if(!job) throw createError(404, 'Invalid job id');
+
+    if(!(req.decodedToken._id == job.creator_id)) {
+        if (req.decodedToken.role == 1) {
+            throw createError(400, 'Only the job creator or admin is allowed to delete a job');
+        }
+    }
+
+    try {
+        job = Job.findOneAndDelete({_id: req.params.jobid}, function(err, deletedJob) {
+            return new Promise(function(resolve, reject) {
+                if(err) return reject(err);
+
+                return resolve(deletedJob);
+            });
         });
+    } catch (error) {
+        throw createError(400, err.message);
+    }
+
+    return res.json({
+        status: 'success',
+        data: null
     });
 };
 
-var updateJob = function(req, res) {
-    // get jobid from req params
-    var jobid = req.params.jobid;
-    var update = req.body;
-
-    // search db for _id equals our jobid
-    Job.findOneAndUpdate({_id: jobid}, update, { new: true }, function(err, jobObject) {
-        if(err) return makeResponse(400, JSON.stringify(err), 'fail', res);
-
-        // return HTTP response.
-        return res.json({
-            status: 'success',
-            data: jobObject
-        });
-    });
-};
-
-var deleteJob = function(req, res) {
-    // get jobid from req params
-    var jobid = req.params.jobid;
-
-    // search db for _id equals our jobid
-    Job.findOneAndDelete({_id: jobid}, {useFindAndModify: false}, function(err, deletedJob) {
-        if(err) return makeResponse(400, JSON.stringify(err), 'fail', res);
-
-        // return HTTP response.
-        return res.json({
-            status: 'success',
-            data: deletedJob
-        });
-    });
-};
-
-var selectApplication = function(req, res){
+const selectApplication = function(req, res){
     // get jobid from req params
     var jobid = req.params.jobid;
     // get application id
@@ -107,11 +196,11 @@ var selectApplication = function(req, res){
     var update = req.body.applicationid;
 };
 
-var updateJobStatus = function(req, res) {
+const updateJobStatus = function(req, res) {
     return res.send({message: 'hello - updateJobStatus'});
 };
 
-var updateJobTimeFrame = function(req, res) {
+const updateJobTimeFrame = function(req, res) {
     return res.send({message: 'hello - updateJobStatus'});
 };
 

@@ -37,22 +37,29 @@ var schema = new mongoose.Schema({
         max: 12,
         required: true
     },
-    start_date: Date,
+    start_date: {
+        type: Date,
+        required: true
+    },
     application_end_date: {
         type: Date,
         validate: function() {
             return this.application_end_date < this.start_date;
-        }
+        },
+        required: true
     },
     end_date: {
         type: Date,
         validate: function() {
-            return this.start_date < this.end_date; 
-        }
+            return this.start_date < this.end_date && this.application_end_date < this.end_date;
+        },
+        required: true
     },
     staffing_status: {
         type: String,
-        enum: ['open', 'closed']
+        enum: ['open', 'closed'],
+        required: true,
+        default: 'open'
     },
     staffed_user_id: {
         type: mongoose.Schema.Types.ObjectId,

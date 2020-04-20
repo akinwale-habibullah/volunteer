@@ -10,6 +10,7 @@ const jobsController = require('../controllers/jobs');
 const applicationsController = require('../controllers/applications');
 
 const authValidationSchema = require('./validationSchemas/auth');
+const jobValidationSchema = require('./validationSchemas/jobs');
 const { validateToken } = require('../config/helpers');
 
 function addRoutes (app, express) {
@@ -39,15 +40,16 @@ function addRoutes (app, express) {
     app.get('/api/v1/users/:userid/profile', validateToken, checkSchema(authValidationSchema.profile), asyncHandler(userController.profile));
 
     // POST - jobs
-    app.post('/api/v1/jobs', validateToken, jobsController.addJob);
+    app.post('/api/v1/jobs', validateToken, checkSchema(jobValidationSchema.create), asyncHandler(jobsController.addJob));
     // GET - jobs
-    app.get('/api/v1/jobs', jobsController.getJobs);
+    app.get('/api/v1/jobs', asyncHandler(jobsController.getJobs));
     // GET - jobs/:jobid
-    app.get('/api/v1/jobs/:jobid', validateToken, jobsController.getOneJob);
+    app.get('/api/v1/jobs/:jobid', validateToken, asyncHandler(jobsController.getOneJob));
     // PATCH - jobs/:jobid
-    app.patch('/api/v1/jobs/:jobid', validateToken, jobsController.updateJob);
+    app.patch('/api/v1/jobs/:jobid', validateToken, checkSchema(jobValidationSchema.edit), asyncHandler(jobsController.updateJob));
     // DELETE - jobs/:jobid
-    app.delete('/api/v1/jobs/:jobid', validateToken, jobsController.deleteJob);
+    app.delete('/api/v1/jobs/:jobid', validateToken, asyncHandler(jobsController.deleteJob));
+    
 
     // OPTIONAL - NICE TO HAVES
     //  // PATCH - jobs/:jobid
@@ -63,8 +65,7 @@ function addRoutes (app, express) {
     app.get('/api/v1/applications/:applicationid', validateToken, applicationsController.getApplication);
     // GET - all applications
     app.get('/api/v1/applications', validateToken, applicationsController.getApplications);
-    // GET - job applications
-    app.get('/api/v1/jobs/:jobid/applications', validateToken, applicationsController.getJobApplications);
+    
     // GET - user applications
     app.get('/api/v1/users/:userid/applications', validateToken, applicationsController.getUserApplications);
     // PATCH - applications
