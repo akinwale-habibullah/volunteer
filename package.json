@@ -16,7 +16,9 @@
     "chai": "^4.2.0",
     "clone-stats": "^1.0.0",
     "express": "^4.17.1",
+    "express-async-handler": "^1.1.4",
     "express-validator": "^6.4.0",
+    "http-errors": "^1.7.3",
     "install": "^0.13.0",
     "jwt-simple": "^0.5.6",
     "mocha": "^7.1.1",
@@ -26,6 +28,7 @@
     "sinon": "^9.0.2",
     "supertest": "^4.0.2",
     "swagger-ui-express": "^4.1.4",
+    "uninstall": "0.0.0",
     "yamljs": "^0.3.0"
   },
   "devDependencies": {
