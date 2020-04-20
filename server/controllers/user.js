@@ -1,65 +1,84 @@
 var jwt = require('jwt-simple');
+const createError = require('http-errors');
 var helpers = require('../config/helpers');
 var User = require('../models/userModel');
 
-var signup = function(req, res) {
-    helpers.checkForValidationErr(req, res);
+var signup = async function(req, res) {
+    const errors = helpers.checkForValidationErr(req);
+    if(errors) {
+        throw createError(400, {message: errors.errors});
+    };
 
-    var email = req.body.email;
-    var newUserObj = req.body;
-    User.findOne({'email': email}, function(err, user){
-        if (err) {
-            return helpers.makeErrorResponse(500, JSON.stringify(err), res);
-        } else {
-            if (user) {
-                return helpers.failResponse(400, "Email already exists", res);
-            } else {
-                User.create(newUserObj, function(err, user) {
-                    if(err) {
-                        return helpers.makeErrorResponse(500, JSON.stringify(err), res);
-                    }
+    let email = req.body.email;
+    let userObj;
+    try {
+        email = req.body.email;
+        userObj = req.body;
 
-                    var token = jwt.encode(user, 'secret');
-                    res.json({
-                        status: 'success',
-                        data: {
-                            token: token,
-                            userid: user['_id']
-                        }
-                    });
-                });
-            }
+        userObj = await User.findOne({'email': email});
+    } catch (error) {
+        throw createError(400, error.message);
+    }
+
+    if (userObj) {
+        throw createError(400, "Email already exists"); 
+    }
+
+    let newUser;
+    let token;
+    try {
+        newUser = new User({
+            email: req.body.email,
+            password: req.body.password
+        });
+        await newUser.save();
+    } catch (error) {
+        throw createError(500, error);
+    }
+    
+    token = jwt.encode(user, 'secret');
+    res.status(201).json({
+        status: 'success',
+        data: {
+            token: token,
+            userid: newUser['_id']
         }
     });
 };
 
-var signin = function(req, res) {
-    helpers.checkForValidationErr(req, res);
+var signin = async function(req, res) {
+    const errors = helpers.checkForValidationErr(req);
+    if(errors) {
+        throw createError(400, {message: errors.errors});
+    };
 
-    var email = req.body.email;
-    var password = req.body.password;
-    User.findOne({'email': email}, function(err, user){
-        if (err) {
-            return helpers.makeErrorResponse(500, JSON.stringify(err), res);
-        } else {
-            if (!user) {
-                return helpers.failResponse(404, 'Incorrect login credentials', res);
-            } else {
-                user.comparePasswords(password, function(err, match) {
-                    if(err || !match) return helpers.failResponse(400, 'Incorrect login credentials', res) ;
-                    
-                    token = jwt.encode(user, 'secret');
-                    res.json({
-                        token,
-                        userid: user['_id'],
-                    });
-                });
-            }
-        }
+    const email = req.body.email;
+    const password = req.body.password;
+    let user;
+    try {
+        user = await User.findOne({'email': email});
+    } catch (error) {
+        throw createError(400, 'Incorrect login credentials');
+    }
+
+    if(!user) throw createError(400, 'Incorrect login credentials');
+
+    const response = await user.comparePassword(password).then((success, err) => {
+        if(err) return err;
+
+        return success;
+    });
+
+    if(!response) throw createError(400, 'Incorrect login credentials');
+
+    token = jwt.encode(user, 'secret');
+    res.json({
+        token: token,
+        userid: user['_id'],
     });
 };
 
-var profile = function(req, res) {
+var profile = async function(req, res) {
     const validationErrors = helpers.checkForValidationErr(req, res);
     if(validationErrors) return helpers.failResponse(400, validationErrors.errors, res);
 
@@ -73,25 +92,21 @@ var profile = function(req, res) {
     // 3 for end user
 
     // get user details of user in request parameters
-    User.findOne({'_id': req.params.userid}, function(err, user_obj) {
-        if (err) {
-            return helpers.errorResponse(500, JSON.stringify(err), res);
-        };
+    let userObj;
+    try {
+        userObj = await User.findOne({'_id': req.params.userid});
+    } catch (error) {
+        throw createError(404, error.message);
+    }
+    if(!userObj) throw createError(404, 'Invalid userid path parameter');
 
-        if (!user_obj) {
-            return helpers.failResponse(400,  'Invalid userid in request parameters', res);
-        };
-
-        // TODO: Fetch relevant user info in jobs and applications
-        res.json({
-            status: 'success',
-            data: {
-                _id: user_obj._id,
-                name: user_obj.email
-            }
-        });
-    });
-    
+    res.json({
+        status: 'success',
+        data: {
+            _id: userObj._id,
+            name: userObj.email
+        }
+    });    
 };
 
 module.exports = {
