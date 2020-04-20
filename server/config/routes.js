@@ -9,7 +9,7 @@ const userController = require('../controllers/user');
 const jobsController = require('../controllers/jobs');
 const applicationsController = require('../controllers/applications');
 
-const authValidationSchema = require('./validation-schemas/auth');
+const authValidationSchema = require('./validationSchemas/auth');
 const { validateToken } = require('../config/helpers');
 
 function addRoutes (app, express) {

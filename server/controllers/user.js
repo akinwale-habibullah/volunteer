@@ -29,14 +29,29 @@ var signup = async function(req, res) {
     try {
         newUser = new User({
             email: req.body.email,
-            password: req.body.password
+            password: req.body.password,
+            name: {
+                first: req.body.firstname,
+                last: req.body.lastname
+            },
+            address: {
+                street: req.body.city || null,
+                city: req.body.city,
+                country: req.body.country
+            },
+            gender: req.body.gender,
+            bio: req.body.bio,
+            volunteer_hours: req.body.volunteerhours
         });
         await newUser.save();
     } catch (error) {
         throw createError(500, error);
     }
-    
-    token = jwt.encode(user, 'secret');
+
+    token = jwt.encode({
+        role: newUser.role,
+        _id: newUser._id
+    }, 'secret');
     res.status(201).json({
         status: 'success',
         data: {
