@@ -27,7 +27,7 @@ var auth = {
         token: {
             in: ['headers'],
             errorMessage: 'Invalid authentication token in request header',
-            isAlphanumeric: true
+            isString: true
         }
     }
 };

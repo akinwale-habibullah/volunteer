@@ -73,11 +73,15 @@ var UserSchema = new mongoose.Schema({
     }]
 }, {timestamps: true});
 
-UserSchema.methods.comparePasswords = function(enteredPassword, callback){
-    var hashedPassword = this.password;
+UserSchema.methods.comparePassword = function(enteredPassword){
+    const hashedPassword = this.password;
 
-    bcrypt.compare(enteredPassword, hashedPassword, function(err, match) {
-        callback(err, match);
+    return new Promise((resolve, reject) => {
+        bcrypt.compare(enteredPassword, hashedPassword, function(err, match){
+            if(err) return reject(err);
+
+            return resolve(match);
+        })
     });
 };
 
