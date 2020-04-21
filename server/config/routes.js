@@ -11,6 +11,7 @@ const applicationsController = require('../controllers/applications');
 
 const authValidationSchema = require('./validationSchemas/auth');
 const jobValidationSchema = require('./validationSchemas/jobs');
+const applicationValidationSchema = require('./validationSchemas/application');
 const { validateToken } = require('../config/helpers');
 
 function addRoutes (app, express) {
@@ -69,7 +70,7 @@ function addRoutes (app, express) {
     // GET - one application
     app.get('/api/v1/applications/:applicationid', validateToken, asyncHandler(applicationsController.getApplication));
     // POST - applications
-    app.post('/api/v1/jobs/:jobid/apply', validateToken, applicationsController.apply);
+    app.post('/api/v1/applications', validateToken, checkSchema(applicationValidationSchema.apply), asyncHandler(applicationsController.apply));
     // PATCH - applications
     app.patch('/api/v1/applications/:applicationid', validateToken, applicationsController.editApplication);
     // DELETE - applications

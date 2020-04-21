@@ -4,28 +4,44 @@ const Job = require('../models/jobModel');
 const User = require('../models/userModel');
 const helpers = require('../config/helpers');
 
-const apply = function(req, res) {
-    var applicationObj = req.body;
-    
-    Job.findOne({_id: req.params.jobid}, function(err, data) {
-        if(err) return helpers.makeResponse(400, JSON.stringify(err), 'fail', res);
+const apply = async function(req, res) {
+    console.log(req.body);
+    const errors = helpers.checkForValidationErr(req);
+    if(errors) {
+        throw createError(400, {message: errors.errors});
+    };
 
-        if(!data) return helpers.makeResponse(404, 'Invalid Job ID', 'fail', res);
+    let job;
+    try {
+        job = await Job.findOne({_id: req.body.job_id});
+    } catch (error) {
+        throw createError(400, error.message);
+    }
 
-        // create application with req body
-        req.body["job_id"] = req.params.jobid;
-        var newApplication = new Application(req.body);
-        // return response
-        newApplication.save(function(err, data) {
-            if(err) {
-                return helpers.makeResponse(404, JSON.stringify(err), 'fail', res)
-            };
+    if (!job) throw createError(404, 'Invalid job id. This job does not exist.');
 
-            res.status(201).json({
-                status: 'success',
-                data: data
-            });
-        })
+    const  application =  new Application({
+        job_id: req.body.job_id,
+        applicant_id: req.decodedToken._id,
+        hours_commitment_per_week: req.body.hours_commitment_per_week,
+        motivation: req.body.motivation,
+    });
+    try {
+       application.save();
+    } catch (error) {
+        throw createError(400, error.message);
+    }
+
+    res.json({
+        status: 'success',
+        data: {
+            _id: application._id,
+            application_id: req.decodedToken._id,
+            job_id: application.job_id,
+            job_role: job.job_role,
+            hours_commitment_per_week: application.hours_commitment_per_week,
+            motivation: application.motivation
+        }
     });
 };
 
@@ -81,7 +97,6 @@ const getJobApplications = async function(req, res) {
     } catch (error) {
         throw createError(400, error);
     }
-    console.log(applications);
 
     res.json({
         status: 'success',
