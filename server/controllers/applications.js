@@ -36,7 +36,7 @@ const apply = async function(req, res) {
         status: 'success',
         data: {
             _id: application._id,
-            application_id: req.decodedToken._id,
+            applicant_id: req.decodedToken._id,
             job_id: application.job_id,
             job_role: job.job_role,
             hours_commitment_per_week: application.hours_commitment_per_week,
@@ -123,27 +123,31 @@ const getUserApplications = function(req, res) {
     });
 };
 
-const editApplication = function(req, res) {
-    // get application id from req params
-    var applicationId = req.params.applicationid;
+const editApplication = async function(req, res) {
+    let application;
+    const applicationid = req.params.applicationid;
 
-    // check existence
-    // change [hours_commitment_per_week, motivation]
-    Application.findOne({_id: applicationId}, function(err, data) {
-        if(err) return helpers.makeResponse(400, JSON.stringify(err), 'error', res);
-        if(!data) return helpers.makeResponse(404, 'Invalid application ID', 'fail', res);
+    try {
+        application = await Application.findOne({_id: applicationid});
+    } catch (error) {
+        throw createError(400, error.message);
+    }
 
-        data["hours_commitment_per_week"] = req.body["hours_commitment_per_week"] || data["hours_commitment_per_week"];
-        data["motivation"] = req.body["motivation"] || data["motivation"];
+    if(!application) throw createError(404, 'Invalid application id.');
+    if(application.applicant_id.toString() != req.decodedToken._id) throw createError(404, 'Only the application who created this record is allowed to edit it.');
 
-        Application.findOneAndUpdate({_id: applicationId}, data, {new: true}, function(err, data) {
-            if(err) return helpers.makeResponse(500, JSON.stringify(err), 'error', res);
+    application.hours_commitment_per_week = req.body.hours_commitment_per_week || application.hours_commitment_per_week;
+    application.motivation = req.body.motivation || application.motivation;
 
-            res.json({
-                status: 'success',
-                data
-            })
-        });
+    try {
+        await application.save()
+    } catch (error) {
+        throw createError(400, error.message);
+    }
+
+    res.json({
+        status: 'success',
+        data: application
     });
 };
 

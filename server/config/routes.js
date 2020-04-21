@@ -72,7 +72,7 @@ function addRoutes (app, express) {
     // POST - applications
     app.post('/api/v1/applications', validateToken, checkSchema(applicationValidationSchema.apply), asyncHandler(applicationsController.apply));
     // PATCH - applications
-    app.patch('/api/v1/applications/:applicationid', validateToken, applicationsController.editApplication);
+    app.patch('/api/v1/applications/:applicationid', validateToken, checkSchema(applicationValidationSchema.edit), asyncHandler(applicationsController.editApplication));
     // DELETE - applications
     app.delete('/api/v1/applications/:applicationid', validateToken, applicationsController.editApplication);
     // GET - user applications
