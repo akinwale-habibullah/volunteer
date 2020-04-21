@@ -50,7 +50,7 @@ const getApplication = async function(req, res) {
     let application;
 
     try {
-        application = await Application.find({_id: applicationid});
+        application = await Application.findOne({_id: applicationid});
     } catch (error) {
         throw createError(400, 'Invalid application id');
     }
@@ -151,28 +151,30 @@ const editApplication = async function(req, res) {
     });
 };
 
-const deleteAplication = function(req, res) {
-    // get application from req params
-    var applicationID = req.params.id;
-    // check if application exists
-    Application.findOne({_id: applicationID}, function(err, data) {
-        if(err) return helpers.makeResponse(400, JSON.stringify(err), 'fail', res);
-        if(!data) return helpers.makeResponse(404, 'Invalid Application ID', 'fail', res);
+const deleteApplication = async function(req, res) {
+    let application;
+    const applicationid = req.params.applicationid;
 
-        Application.findOneAndDelete({_id, applicationID}, function(err, data){
-            if(err) return helpers.makeResponse(500, JSON.stringify(err), 'fail', res);
+    try {
+        application = await Application.findOne({_id: applicationid});
+    } catch (error) {
+        throw createError(400, error.message);
+    }
 
-            res.status(204);
-            res.json({
-                status: 'success',
-                data: null
-            });
-        })
+    if(!application) throw createError(404, 'Invalid application id. This application doesn\'t exist');
+    if(application.applicant_id.toString() != req.decodedToken._id.toString()) throw createError(400, 'Unauthorized. Only the creator of this application is allowed to delete it');
+
+    try {
+        delete application;
+        await Application.findOneAndDelete({_id: applicationid});
+    } catch (error) {
+        throw createError(400, error.message);
+    }
+
+    res.json({
+        status: 'success',
+        data: null
     });
-    // delete application
-    // return http response
-
-    return res.send({message: 'hello - deleteApplications'});
 };
 
 module.exports = {
@@ -182,5 +184,5 @@ module.exports = {
     getJobApplications,
     getUserApplications,
     editApplication,
-    deleteAplication,
+    deleteApplication,
 };

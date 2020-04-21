@@ -74,7 +74,7 @@ function addRoutes (app, express) {
     // PATCH - applications
     app.patch('/api/v1/applications/:applicationid', validateToken, checkSchema(applicationValidationSchema.edit), asyncHandler(applicationsController.editApplication));
     // DELETE - applications
-    app.delete('/api/v1/applications/:applicationid', validateToken, applicationsController.editApplication);
+    app.delete('/api/v1/applications/:applicationid', validateToken, asyncHandler(applicationsController.deleteApplication));
     // GET - user applications
     app.get('/api/v1/users/:userid/applications', validateToken, applicationsController.getUserApplications);
     
