@@ -29,29 +29,35 @@ const apply = function(req, res) {
     });
 };
 
-const getApplication = function(req, res) {
-    applicationID = req.params.applicationid;
+const getApplication = async function(req, res) {
+    applicationid = req.params.applicationid;
+    let application;
 
-    Application.findOne({_id: applicationID}, function(err, data){
-        if(err) return helpers.makeResponse(400, JSON.stringify(err), 'fail', res);
+    try {
+        application = await Application.find({_id: applicationid});
+    } catch (error) {
+        throw createError(400, 'Invalid application id');
+    }
 
-        if(!data) return helpers.makeResponse(404, 'Invalid Job ID', 'fail', res);
+    if(!application) throw createError(404, 'Invalid application id. This application does not exist');
 
-        return res.json({
-            status: 'success',
-            data
-        });
+    res.json({
+        status: 'success',
+        data: application
     });
 };
 
-const getApplications = function(req, res) {
-    Application.find({}, function(err, data){
-        if(err) return helpers.makeResponse(404, JSON.stringify(err), 'fail', res);
-
-        return res.json({
-            status: 'success',
-            data
-        });
+const getApplications = async function(req, res) {
+    let applications;
+    try {
+        applications = await Application.find({});
+    } catch (error) {
+        throw createError(400, error);
+    }
+    
+    return res.json({
+        status: 'success',
+        data: applications
     });
 };
 

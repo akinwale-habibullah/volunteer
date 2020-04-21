@@ -64,19 +64,20 @@ function addRoutes (app, express) {
     // app.patch('/api/v1/jobs/:jobid/timeframe', jobsController.updateJobTimeFrame);
     
 
+    // GET - all applications
+    app.get('/api/v1/applications', validateToken, asyncHandler(applicationsController.getApplications));
+    // GET - one application
+    app.get('/api/v1/applications/:applicationid', validateToken, asyncHandler(applicationsController.getApplication));
     // POST - applications
     app.post('/api/v1/jobs/:jobid/apply', validateToken, applicationsController.apply);
-    // GET - one application
-    app.get('/api/v1/applications/:applicationid', validateToken, applicationsController.getApplication);
-    // GET - all applications
-    app.get('/api/v1/applications', validateToken, applicationsController.getApplications);
-    
-    // GET - user applications
-    app.get('/api/v1/users/:userid/applications', validateToken, applicationsController.getUserApplications);
     // PATCH - applications
     app.patch('/api/v1/applications/:applicationid', validateToken, applicationsController.editApplication);
     // DELETE - applications
     app.delete('/api/v1/applications/:applicationid', validateToken, applicationsController.editApplication);
+    // GET - user applications
+    app.get('/api/v1/users/:userid/applications', validateToken, applicationsController.getUserApplications);
+    
+    
 
 
     /**
