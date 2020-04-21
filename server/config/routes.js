@@ -50,14 +50,16 @@ function addRoutes (app, express) {
     // DELETE - jobs/:jobid
     app.delete('/api/v1/jobs/:jobid', validateToken, asyncHandler(jobsController.deleteJob));
     
+    // PATCH - jobs/:jobid/staffApplicant
+    app.patch('/api/v1/jobs/:jobid/applications/:applicationid/select', validateToken, asyncHandler(jobsController.selectApplicant));
+    // // GET - user applications
+    // app.get('/api/v1/users/:userid/applications', validateToken, applicationsController.getUserApplications);
 
     // OPTIONAL - NICE TO HAVES
     //  // PATCH - jobs/:jobid
     // app.patch('/api/v1/jobs/:jobid/status', jobsController.updateJobStatus);
     // // PATCH - jobs/:jobid/timeframe
     // app.patch('/api/v1/jobs/:jobid/timeframe', jobsController.updateJobTimeFrame);
-    // // PATCH - jobs/:jobid/staffApplicant
-    // app.patch('/api/v1/jobs/:jobid/staffapplicant', jobsController.staffApplicant);
 
     // POST - applications
     app.post('/api/v1/jobs/:jobid/apply', validateToken, applicationsController.apply);

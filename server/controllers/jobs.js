@@ -1,7 +1,9 @@
 const createError = require('http-errors');
+const ObjectID = require('mongoose').mongo.ObjectID;
 const helpers = require('../config/helpers');
 const Job = require('../models/jobModel');
 const User = require('../models/userModel');
+const Application = require('../models//applicationModel');
 
 const addJob = async function(req, res) {
     const errors = helpers.checkForValidationErr(req);
@@ -172,28 +174,42 @@ const deleteJob = async function(req, res) {
     });
 };
 
-const selectApplication = function(req, res){
-    // get jobid from req params
-    var jobid = req.params.jobid;
-    // get application id
-    var applicationid = req.body.applicationid;
+const selectApplicant = async function(req, res){
+    const jobid = req.params.jobid;
+    const applicationid = req.params.applicationid;
 
-    // get job record
-    Job.findOne({_id: jobid}, function(err, jobObject){
-        if(err) return makeResponse(400, JSON.stringify(err), 'fail', res);
+    let job
+    try {
+        job = await Job.findOne({_id: jobid});
+    } catch (error) {
+        throw createError(400, error);
+    }
 
-        // update application id as selected
-            // jobObject['staffed_user'] = applicationid;
-        // update other ids as not selected
-        // update job with selected applicant id
+    if (!job) throw createError(400, 'Invalid job id');
+    // if (job._id != req.decodedToken._id) createError(400, 'Unauthorized. Only the job owner can edit this job record');
 
-        Job.update({_id: jobObject._id}, jobObject, function(err, raw) {
-            if(err) console.log(JSON.stringify(err));
+    let application;
+    try {
+        application = await Application.findOne({_id: applicationid});
+    } catch (error) {
+        throw createError(400, error);
+    }
 
-            console.log(raw);
-        });
+    if (!application.job_id.equals(job._id)) {
+        throw createError(400, 'This application is not for this job');
+    }
+
+    try {
+        job.application_id = application._id;
+        await job.save();
+    } catch (error) {
+        throw createError(400, error.message);
+    }
+
+    res.json({
+        status: 'success',
+        data: null
     });
-    var update = req.body.applicationid;
 };
 
 const updateJobStatus = function(req, res) {
@@ -214,5 +230,5 @@ module.exports = {
     getJobs,
     updateJobStatus,
     updateJobTimeFrame,
-    selectApplication
+    selectApplicant
 };

@@ -61,9 +61,9 @@ var schema = new mongoose.Schema({
         required: true,
         default: 'open'
     },
-    staffed_user_id: {
+    application_id: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User'
+        ref: 'Application'
     }
 }, {timestamps: true});
 
