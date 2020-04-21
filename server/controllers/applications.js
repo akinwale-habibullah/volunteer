@@ -104,22 +104,28 @@ const getJobApplications = async function(req, res) {
     });
 };
 
-const getUserApplications = function(req, res) {
-    // get user id from req.params
-    var user_id = req.params.userid;
-    // check user existence in the db
-    // get applications with user_id
-    // return http response
-    User.findOne({_id: user_id}, function(err, data) {
-        if(err) return helpers.makeResponse(400, JSON.stringify(err), 'error', res);
-        if(!data) return helpers.makeResponse(404, 'Invalid user ID', 'fail', res);
+const getUserApplications = async function(req, res) {
+    let user;
+    const userid = req.params.userid;
 
-        Application.findOne({user_id: user_id}, function(err, data){
-            res.json({
-                status: 'success',
-                data
-            });
-        });
+    try {
+        user = await User.findOne({_id: userid});
+    } catch (error) {
+        throw createError(400, error.message);
+    }
+
+    if(!user) throw createError(404, 'Invalid user id. This user doesn\'t exist');
+
+    let applications;
+    try {
+        application = await Application.find({applicant_id: user._id});
+    } catch (error) {
+        throw createError(400, error.message);
+    }
+
+    res.json({
+        sattus: 'success',
+        data: applications
     });
 };
 
