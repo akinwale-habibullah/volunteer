@@ -52,14 +52,17 @@ function addRoutes (app, express) {
     
     // PATCH - jobs/:jobid/staffApplicant
     app.patch('/api/v1/jobs/:jobid/applications/:applicationid/select', validateToken, asyncHandler(jobsController.selectApplicant));
+    // GET - jobs applications
+    app.get('/api/v1/jobs/:jobid/applications', validateToken, asyncHandler(applicationsController.getJobApplications));
     // // GET - user applications
-    // app.get('/api/v1/users/:userid/applications', validateToken, applicationsController.getUserApplications);
+    // app.get('/api/v1/users/:userid/applications', validateToken, asyncHandler(applicationsController.getUserApplications));
 
     // OPTIONAL - NICE TO HAVES
     //  // PATCH - jobs/:jobid
     // app.patch('/api/v1/jobs/:jobid/status', jobsController.updateJobStatus);
     // // PATCH - jobs/:jobid/timeframe
     // app.patch('/api/v1/jobs/:jobid/timeframe', jobsController.updateJobTimeFrame);
+    
 
     // POST - applications
     app.post('/api/v1/jobs/:jobid/apply', validateToken, applicationsController.apply);

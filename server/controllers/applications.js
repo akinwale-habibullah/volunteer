@@ -1,9 +1,10 @@
-var Application = require('../models/applicationModel');
-var Job = require('../models/jobModel');
-var User = require('../models/userModel');
-var helpers = require('../config/helpers');
+const createError = require('http-errors');
+const Application = require('../models/applicationModel');
+const Job = require('../models/jobModel');
+const User = require('../models/userModel');
+const helpers = require('../config/helpers');
 
-var apply = function(req, res) {
+const apply = function(req, res) {
     var applicationObj = req.body;
     
     Job.findOne({_id: req.params.jobid}, function(err, data) {
@@ -28,7 +29,7 @@ var apply = function(req, res) {
     });
 };
 
-var getApplication = function(req, res) {
+const getApplication = function(req, res) {
     applicationID = req.params.applicationid;
 
     Application.findOne({_id: applicationID}, function(err, data){
@@ -43,7 +44,7 @@ var getApplication = function(req, res) {
     });
 };
 
-var getApplications = function(req, res) {
+const getApplications = function(req, res) {
     Application.find({}, function(err, data){
         if(err) return helpers.makeResponse(404, JSON.stringify(err), 'fail', res);
 
@@ -54,29 +55,35 @@ var getApplications = function(req, res) {
     });
 };
 
-var getJobApplications = function(req, res) {
-    // retrieve jobid from req.params
-    var jobId = req.params.jobid;
-    // retrieve job from db
-    Job.findOne({_id: jobId}, function(err, data) {
-        if(err) return helpers.makeResponse(400, JSON.stringify(err), 'fail', res);
-        if(!data) return helpers.makeResponse(404, 'Invalid Job ID', 'fail', res);
+const getJobApplications = async function(req, res) {
+    let job;
+    var jobid = req.params.jobid;
 
+    try {
+        job = await Job.findOne({_id: jobid})
+    } catch (error) {
+        throw createError(400, error);
+    }
 
-        // retrieve applications from Application with jobid
-        Application.find({job_id: jobId}, function(err, data) {
-            if(err) return helpers.makeResponse(400, JSON.stringify(err), 'fail', res);
-            if(!data) return helpers.makeResponse(404, 'Invalid Job ID', 'fail', res);
+    if (!job.creator_id.toString() == req.decodedToken._id) {
+        if(req.decodedToken.role != 3) throw createError(400, 'Only ')
+    }
 
-            return res.json({
-                status: 'success',
-                data
-            });
-        });
+    let applications;
+    try {
+        applications = await Application.find({job_id: jobid})
+    } catch (error) {
+        throw createError(400, error);
+    }
+    console.log(applications);
+
+    res.json({
+        status: 'success',
+        data: applications
     });
 };
 
-var getUserApplications = function(req, res) {
+const getUserApplications = function(req, res) {
     // get user id from req.params
     var user_id = req.params.userid;
     // check user existence in the db
@@ -95,7 +102,7 @@ var getUserApplications = function(req, res) {
     });
 };
 
-var editApplication = function(req, res) {
+const editApplication = function(req, res) {
     // get application id from req params
     var applicationId = req.params.applicationid;
 
@@ -119,7 +126,7 @@ var editApplication = function(req, res) {
     });
 };
 
-var deleteAplication = function(req, res) {
+const deleteAplication = function(req, res) {
     // get application from req params
     var applicationID = req.params.id;
     // check if application exists

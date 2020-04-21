@@ -64,7 +64,11 @@ var schema = new mongoose.Schema({
     application_id: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Application'
-    }
+    },
+    applications: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Application'
+    }]
 }, {timestamps: true});
 
 module.exports = mongoose.model('Job', schema);
